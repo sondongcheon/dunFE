@@ -1,0 +1,185 @@
+import React, { useState } from "react";
+
+/**
+ * Group 컴포넌트
+ * - 그룹 생성 (현재 localStorage 더미 저장)
+ * - 그룹 목록 표시
+ * - 그룹에 캐릭터 등록 / 등록 해제
+ */
+function Group({
+  groups = [],
+  characters = [],
+  onCreateGroup,
+  onAddCharacter,
+  onRemoveCharacter,
+}) {
+  const [newGroupName, setNewGroupName] = useState("");
+  const [expandedId, setExpandedId] = useState(null);
+  const [addTargetGroupId, setAddTargetGroupId] = useState(null);
+
+  const handleCreate = () => {
+    const name = newGroupName.trim();
+    if (!name) return;
+    onCreateGroup(name);
+    setNewGroupName("");
+  };
+
+  const handleAdd = (groupId, characterId) => {
+    onAddCharacter(groupId, characterId);
+    setAddTargetGroupId(null);
+  };
+
+  return (
+    <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      <h2 className="text-2xl font-bold mb-4">Group</h2>
+
+      {/* 그룹 생성 */}
+      <div className="flex gap-2 mb-4">
+        <input
+          type="text"
+          value={newGroupName}
+          onChange={(e) => setNewGroupName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+          placeholder="그룹 이름"
+          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500"
+        />
+        <button
+          type="button"
+          onClick={handleCreate}
+          className="px-4 py-2 text-sm font-medium bg-gray-800 dark:bg-gray-700 text-white rounded hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
+        >
+          그룹 만들기
+        </button>
+      </div>
+
+      {/* 그룹 목록 */}
+      <div className="space-y-2">
+        {groups.length === 0 ? (
+          <div className="text-sm text-gray-500 dark:text-gray-400 py-4">
+            생성된 그룹이 없습니다. 위에서 그룹을 만들어 보세요.
+          </div>
+        ) : (
+          groups.map((group) => {
+            const isExpanded = expandedId === group.id;
+            const isAdding = addTargetGroupId === group.id;
+            const memberIds = group.characterIds || [];
+            const members = memberIds
+              .map((cid) => characters.find((c) => c.id === cid))
+              .filter(Boolean);
+            const addable = characters.filter((c) => !memberIds.includes(c.id));
+
+            return (
+              <div
+                key={group.id}
+                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+              >
+                <div
+                  className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  onClick={() => setExpandedId(isExpanded ? null : group.id)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {group.name}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      (캐릭터 {members.length}명)
+                    </span>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {isExpanded ? "▲" : "▼"}
+                  </span>
+                </div>
+
+                {isExpanded && (
+                  <div className="border-t border-gray-200 dark:border-gray-700 px-3 py-3 space-y-3">
+                    {/* 등록된 캐릭터 */}
+                    <div className="space-y-1">
+                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        등록된 캐릭터
+                      </div>
+                      {members.length === 0 ? (
+                        <div className="text-xs text-gray-500 dark:text-gray-400 py-2">
+                          없음
+                        </div>
+                      ) : (
+                        members.map((char) => (
+                          <div
+                            key={char.id}
+                            className="flex items-center justify-between gap-2 px-2 py-1.5 bg-gray-50 dark:bg-gray-700/50 rounded text-sm"
+                          >
+                            <span className="text-gray-900 dark:text-white">
+                              {char.name}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onRemoveCharacter(group.id, char.id);
+                              }}
+                              className="text-xs text-red-600 dark:text-red-400 hover:underline"
+                            >
+                              제거
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    {/* 캐릭터 추가 */}
+                    <div>
+                      {isAdding ? (
+                        <div className="space-y-1">
+                          <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                            캐릭터 선택
+                          </div>
+                          {addable.length === 0 ? (
+                            <div className="text-xs text-gray-500 dark:text-gray-400 py-2">
+                              추가 가능한 캐릭터가 없습니다.
+                            </div>
+                          ) : (
+                            <div className="flex flex-wrap gap-1">
+                              {addable.map((char) => (
+                                <button
+                                  key={char.id}
+                                  type="button"
+                                  onClick={() => handleAdd(group.id, char.id)}
+                                  className="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-600 rounded hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-900 dark:text-white"
+                                >
+                                  {char.name}
+                                </button>
+                              ))}
+                              <button
+                                type="button"
+                                onClick={() => setAddTargetGroupId(null)}
+                                className="px-2 py-1 text-xs text-gray-500 hover:underline"
+                              >
+                                취소
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setAddTargetGroupId(group.id);
+                          }}
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          + 캐릭터 추가
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default Group;

@@ -2,13 +2,15 @@ import React, { useState } from "react";
 
 /**
  * Group 컴포넌트
- * - 그룹 생성 (현재 localStorage 더미 저장)
- * - 그룹 목록 표시
+ * - 그룹 생성 (API 호출)
+ * - 그룹 목록 표시 (내가 가진 그룹 + 내 캐릭터가 속한 그룹)
  * - 그룹에 캐릭터 등록 / 등록 해제
  */
 function Group({
   groups = [],
   characters = [],
+  loading = false,
+  currentAdventureId,
   onCreateGroup,
   onAddCharacter,
   onRemoveCharacter,
@@ -54,7 +56,11 @@ function Group({
 
       {/* 그룹 목록 */}
       <div className="space-y-2">
-        {groups.length === 0 ? (
+        {loading ? (
+          <div className="text-sm text-gray-500 dark:text-gray-400 py-4">
+            그룹 목록을 불러오는 중...
+          </div>
+        ) : groups.length === 0 ? (
           <div className="text-sm text-gray-500 dark:text-gray-400 py-4">
             생성된 그룹이 없습니다. 위에서 그룹을 만들어 보세요.
           </div>
@@ -62,11 +68,22 @@ function Group({
           groups.map((group) => {
             const isExpanded = expandedId === group.id;
             const isAdding = addTargetGroupId === group.id;
-            const memberIds = group.characterIds || [];
+            
+            // 서버 응답의 members 배열에서 캐릭터 정보 추출
+            const memberIds = group.members?.map((member) => 
+              member.characterId || member.id
+            ) || [];
             const members = memberIds
               .map((cid) => characters.find((c) => c.id === cid))
               .filter(Boolean);
             const addable = characters.filter((c) => !memberIds.includes(c.id));
+            
+            // 그룹 타입 표시
+            const groupType = group.isMyGroup 
+              ? "내 그룹" 
+              : group.hasMyCharacters 
+                ? "내 캐릭터가 속한 그룹" 
+                : null;
 
             return (
               <div
@@ -81,6 +98,15 @@ function Group({
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
                       {group.name}
                     </span>
+                    {groupType && (
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${
+                        group.isMyGroup
+                          ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
+                          : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                      }`}>
+                        {groupType}
+                      </span>
+                    )}
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       (캐릭터 {members.length}명)
                     </span>

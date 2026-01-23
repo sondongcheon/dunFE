@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 
 /**
  * Characters 컴포넌트
- * 페이지 로딩 시 서버에서 받아온 캐릭터 목록 표시 (현재 더미)
+ * 페이지 로딩 시 서버에서 받아온 캐릭터 목록 표시
  * @param {Array} characters - 캐릭터 데이터 배열
  * @param {boolean} loading - 로딩 여부
  * @param {Set<number>} addedCharacterIds - 그룹에 등록된 캐릭터 ID 집합 (제외해서 보기 시 필터)
@@ -94,6 +94,13 @@ function Characters({ characters = [], loading = false, addedCharacterIds }) {
             </div>
             <span className="text-sm font-medium text-gray-900 dark:text-white">
               {character.name}
+            </span>
+            <span className={`text-xs px-2 py-0.5 rounded font-medium ${
+              character.clearStatus
+                ? "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+            }`}>
+              {character.clearStatus ? "클리어" : "미클리어"}
             </span>
             <span className="text-xs text-gray-600 dark:text-gray-400">
               고유번호: {character.id}

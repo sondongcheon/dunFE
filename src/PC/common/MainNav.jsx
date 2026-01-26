@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "@/store/settingsSlice";
+import LoginModal from "./LoginModal";
+import CharacterAddModal from "./CharacterAddModal";
 
 const NAV_ITEMS = [
   { path: "/", label: "홈" },
@@ -16,6 +18,31 @@ function MainNav() {
   const navigate = useNavigate();
   const location = useLocation();
   const [hoveredNav, setHoveredNav] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [adventureName, setAdventureName] = useState("");
+
+  // 페이지 로드 시 localStorage에서 로그인 정보 확인
+  useEffect(() => {
+    const savedId = localStorage.getItem("adventureId");
+    const savedName = localStorage.getItem("adventureName");
+    
+    if (savedId && savedName) {
+      setIsLoggedIn(true);
+      setAdventureName(savedName);
+    }
+  }, []);
+
+  const handleLoginSuccess = (result) => {
+    setIsLoggedIn(true);
+    setAdventureName(result.adventureName);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("adventureId");
+    localStorage.removeItem("adventureName");
+    setIsLoggedIn(false);
+    setAdventureName("");
+  };
 
   return (
     <div className="fixed top-0 left-0 w-full z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -32,15 +59,22 @@ function MainNav() {
 
           {/* 우측 버튼들 */}
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => {
-                // 로그인 기능은 추후 구현
-                console.log("로그인");
-              }}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-            >
-              로그인
-            </button>
+            <CharacterAddModal />
+            {isLoggedIn ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  {adventureName}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  로그아웃
+                </button>
+              </div>
+            ) : (
+              <LoginModal onLoginSuccess={handleLoginSuccess} />
+            )}
             <button
               onClick={() => dispatch(toggleDarkMode())}
               className="p-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"

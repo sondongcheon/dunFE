@@ -8,7 +8,7 @@ import { CONTENT_IDS } from "../constants";
  */
 function ContentSidebar() {
   const { id } = useParams();
-  const currentId = id && Object.keys(CONTENT_IDS).includes(id) ? id : "a";
+  const currentId = id && Object.keys(CONTENT_IDS).includes(id) ? id : "azure_main";
 
   return (
     <Sidebar>

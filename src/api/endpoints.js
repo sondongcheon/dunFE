@@ -5,9 +5,10 @@
  * 엔드포인트가 변경되면 이 파일만 수정하면 됩니다.
  */
 
-// Test 관련 엔드포인트
-export const TEST_ENDPOINTS = {
-    CHARACTERS: "/test/characters",
+// Character 관련 엔드포인트
+export const CHARACTER_ENDPOINTS = {
+    LIST: "/characters",
+    ADD: "/characters",
 };
 
 // Group 관련 엔드포인트
@@ -18,8 +19,13 @@ export const GROUP_ENDPOINTS = {
 
 // Member 관련 엔드포인트
 export const MEMBER_ENDPOINTS = {
-    ADD: "/member",
-    REMOVE: "/member",
+    ADD: "/content/member",
+    REMOVE: "/content/member",
+};
+
+// Auth 관련 엔드포인트
+export const AUTH_ENDPOINTS = {
+    LOGIN: "/adventure/login",
 };
 
 // User 관련 엔드포인트 (예시)
@@ -28,8 +34,7 @@ export const MEMBER_ENDPOINTS = {
 //   UPDATE: "/user/update",
 // };
 
-// Content 관련 엔드포인트 (예시)
-// export const CONTENT_ENDPOINTS = {
-//   LIST: "/content/list",
-//   DETAIL: "/content/detail",
-// };
+// Content 관련 엔드포인트
+export const CONTENT_ENDPOINTS = {
+    DETAIL: "/content",
+};

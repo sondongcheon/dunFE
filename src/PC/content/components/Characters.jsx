@@ -95,18 +95,18 @@ function Characters({ characters = [], loading = false, addedCharacterIds }) {
             <span className="text-sm font-medium text-gray-900 dark:text-white">
               {character.name}
             </span>
-            <span className={`text-xs px-2 py-0.5 rounded font-medium ${
-              character.clearStatus
-                ? "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
-                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-            }`}>
-              {character.clearStatus ? "클리어" : "미클리어"}
-            </span>
+            {character.job && (
+              <span className="text-xs text-gray-600 dark:text-gray-400">
+                {character.job}
+              </span>
+            )}
+            {character.groupNum !== null && character.groupNum !== undefined && (
+              <span className="text-xs px-2 py-0.5 rounded font-medium bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">
+                그룹 {character.groupNum}
+              </span>
+            )}
             <span className="text-xs text-gray-600 dark:text-gray-400">
-              고유번호: {character.id}
-            </span>
-            <span className="text-xs text-gray-600 dark:text-gray-400">
-              값: {character.value}
+              명성: {character.value}
             </span>
           </div>
           ))

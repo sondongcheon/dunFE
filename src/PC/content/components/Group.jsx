@@ -11,13 +11,22 @@ function Group({
   characters = [],
   loading = false,
   currentAdventureId,
+  contentName,
   onCreateGroup,
   onAddCharacter,
   onRemoveCharacter,
 }) {
   const [newGroupName, setNewGroupName] = useState("");
-  const [expandedId, setExpandedId] = useState(null);
+  // 여러 그룹을 동시에 펼칠 수 있도록 배열 사용
+  const [expandedIds, setExpandedIds] = useState([]);
   const [addTargetGroupId, setAddTargetGroupId] = useState(null);
+  
+  // 기본 상태: 모든 그룹이 펼쳐진 상태
+  React.useEffect(() => {
+    if (groups.length > 0 && expandedIds.length === 0) {
+      setExpandedIds(groups.map(g => g.id));
+    }
+  }, [groups]);
 
   const handleCreate = () => {
     const name = newGroupName.trim();
@@ -66,17 +75,21 @@ function Group({
           </div>
         ) : (
           groups.map((group) => {
-            const isExpanded = expandedId === group.id;
+            const isExpanded = expandedIds.includes(group.id);
             const isAdding = addTargetGroupId === group.id;
             
-            // 서버 응답의 members 배열에서 캐릭터 정보 추출
-            const memberIds = group.members?.map((member) => 
-              member.characterId || member.id
-            ) || [];
-            const members = memberIds
-              .map((cid) => characters.find((c) => c.id === cid))
-              .filter(Boolean);
-            const addable = characters.filter((c) => !memberIds.includes(c.id));
+            // groupNum이 group.id와 일치하는 캐릭터들을 해당 그룹의 멤버로 간주
+            const members = characters.filter((char) => 
+              char.groupNum !== null && char.groupNum !== undefined && 
+              char.groupNum === group.id
+            );
+            const memberIds = new Set(members.map((m) => m.id));
+            
+            // 그룹에 속하지 않은 캐릭터들 (groupNum이 null이거나 undefined인 경우만)
+            // 중복 그룹은 허용하지 않으므로 이미 어떤 그룹에든 속해있는 캐릭터는 제외
+            const addable = characters.filter((char) => 
+              char.groupNum === null || char.groupNum === undefined
+            );
             
             // 그룹 타입 표시
             const groupType = group.isMyGroup 
@@ -92,7 +105,13 @@ function Group({
               >
                 <div
                   className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  onClick={() => setExpandedId(isExpanded ? null : group.id)}
+                  onClick={() => {
+                    if (isExpanded) {
+                      setExpandedIds(expandedIds.filter(id => id !== group.id));
+                    } else {
+                      setExpandedIds([...expandedIds, group.id]);
+                    }
+                  }}
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -140,7 +159,9 @@ function Group({
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                onRemoveCharacter(group.id, char.id);
+                                // groupId는 char.groupNum (characters 안에 있는 groupId)
+                                // contentName은 현재 페이지의 contentName
+                                onRemoveCharacter(char.groupNum, contentName);
                               }}
                               className="text-xs text-red-600 dark:text-red-400 hover:underline"
                             >

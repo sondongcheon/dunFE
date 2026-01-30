@@ -160,8 +160,9 @@ function Group({
                               onClick={(e) => {
                                 e.stopPropagation();
                                 // groupId는 char.groupNum (characters 안에 있는 groupId)
+                                // characterId는 char.id (선택한 캐릭터의 id)
                                 // contentName은 현재 페이지의 contentName
-                                onRemoveCharacter(char.groupNum, contentName);
+                                onRemoveCharacter(char.groupNum, char.id, contentName);
                               }}
                               className="text-xs text-red-600 dark:text-red-400 hover:underline"
                             >

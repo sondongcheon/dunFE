@@ -6,6 +6,7 @@
 export const CONTENT_IDS = {
     azure_main: "애쥬어 메인",
     goddess_of_death_temple: "죽음의 여신전",
+    venus_goddess_of_beauty: "미의 여신 베누스",
     nabel: "만들어진 신, 나벨",
     inae: "이내 황혼전",
     diregie: "검은 역병의 디레지에",

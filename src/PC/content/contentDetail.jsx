@@ -142,12 +142,13 @@ function ContentDetail() {
     }
   };
 
-  const handleRemoveCharacterFromGroup = async (groupId, contentName) => {
+  const handleRemoveCharacterFromGroup = async (groupId, characterId, contentName) => {
     try {
       // API 호출: 그룹에서 캐릭터 제거
       // groupId: characters 안에 있는 groupId (char.groupNum)
+      // characterId: characters의 id 값
       // contentName: CONTENT_IDS의 값 (현재 페이지의 id)
-      await removeCharacterFromGroup(groupId, contentName);
+      await removeCharacterFromGroup(groupId, characterId, contentName);
       
       // 데이터 새로고침
       const data = await fetchContentData(id);

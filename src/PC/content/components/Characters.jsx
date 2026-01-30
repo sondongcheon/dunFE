@@ -105,6 +105,13 @@ function Characters({ characters = [], loading = false, addedCharacterIds }) {
                 그룹 {character.groupNum}
               </span>
             )}
+            <span className={`text-xs px-2 py-0.5 rounded font-medium ${
+              character.clearState
+                ? "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+            }`}>
+              {character.clearState ? "[클리어]" : "[미클리어]"}
+            </span>
             <span className="text-xs text-gray-600 dark:text-gray-400">
               명성: {character.value}
             </span>

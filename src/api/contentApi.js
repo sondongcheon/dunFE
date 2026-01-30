@@ -34,7 +34,7 @@ export async function fetchContentData(contentName) {
         const characters = Array.isArray(data.characters) ? data.characters : [];
 
         // 캐릭터 데이터 매핑
-        // id → id, nickname → name, fame → value, job → job, memo → memo, groupNum → groupNum
+        // id → id, nickname → name, fame → value, job → job, memo → memo, groupNum → groupNum, clearState → clearState
         const mappedCharacters = characters.map((item) => ({
             id: item.id,
             name: item.nickname || "",
@@ -42,6 +42,7 @@ export async function fetchContentData(contentName) {
             job: item.job || "",
             memo: item.memo || null,
             groupNum: item.groupNum || null,
+            clearState: typeof item.clearState === 'boolean' ? item.clearState : false,
             image: null,
         }));
 
@@ -80,14 +81,16 @@ export async function addCharacterToGroup(groupId, characterId, contentName) {
 /**
  * 그룹에서 캐릭터 제거 (API 호출)
  * @param {number} groupId - 그룹 ID (characters의 groupNum 값)
+ * @param {number} characterId - 캐릭터 ID (characters의 id 값)
  * @param {string} contentName - 콘텐츠 이름 (CONTENT_IDS의 키 값, 예: "nabel")
  * @returns {Promise<void>}
  */
-export async function removeCharacterFromGroup(groupId, contentName) {
+export async function removeCharacterFromGroup(groupId, characterId, contentName) {
     try {
         await apiClient.delete(MEMBER_ENDPOINTS.REMOVE, {
             params: {
                 groupId,
+                characterId,
                 contentName,
             },
         });

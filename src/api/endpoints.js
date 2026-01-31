@@ -9,12 +9,15 @@
 export const CHARACTER_ENDPOINTS = {
     LIST: "/characters",
     ADD: "/characters",
+    MEMO: "/characters/memo",
 };
 
 // Group 관련 엔드포인트
 export const GROUP_ENDPOINTS = {
-    CREATE: "/group",
+    CREATE: "/content/group",
     LIST: "/group",
+    UPDATE: "/content/group",
+    DELETE: "/content/group",
 };
 
 // Member 관련 엔드포인트
@@ -26,6 +29,7 @@ export const MEMBER_ENDPOINTS = {
 // Auth 관련 엔드포인트
 export const AUTH_ENDPOINTS = {
     LOGIN: "/adventure/login",
+    LOGOUT: "/adventure/logout",
 };
 
 // User 관련 엔드포인트 (예시)
@@ -37,4 +41,18 @@ export const AUTH_ENDPOINTS = {
 // Content 관련 엔드포인트
 export const CONTENT_ENDPOINTS = {
     DETAIL: "/content",
+};
+
+// Party 관련 엔드포인트
+export const PARTY_ENDPOINTS = {
+    CREATE: "/content/party",
+    JOIN: "/content/party/join",
+    INVITE: "/content/party/invite",
+    UPDATE: "/content/party",
+    DELETE: "/content/party",
+    CREATE_GROUP: "/content/party/group",
+    UPDATE_GROUP: "/content/party/group",
+    DELETE_GROUP: "/content/party/group",
+    ADD_MEMBER: "/content/party/group/member",
+    REMOVE_MEMBER: "/content/party/group/member",
 };

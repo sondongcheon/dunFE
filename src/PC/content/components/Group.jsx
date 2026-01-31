@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import EditableMemo from "./EditableMemo";
+import { toServerIdForUrl } from "@/utils/serverMapping";
 
 /**
  * Group 컴포넌트
  * - 그룹 생성 (API 호출)
  * - 그룹 목록 표시 (내가 가진 그룹 + 내 캐릭터가 속한 그룹)
  * - 그룹에 캐릭터 등록 / 등록 해제
+ * @param {Function} onRemoveGroup - private 그룹 제거 핸들러 (groupId)
  */
 function Group({
   groups = [],
@@ -15,11 +18,16 @@ function Group({
   onCreateGroup,
   onAddCharacter,
   onRemoveCharacter,
+  onMemoUpdate,
+  onUpdateGroupName,
+  onRemoveGroup,
+  canEditMemo = false,
 }) {
   const [newGroupName, setNewGroupName] = useState("");
-  // 여러 그룹을 동시에 펼칠 수 있도록 배열 사용
   const [expandedIds, setExpandedIds] = useState([]);
   const [addTargetGroupId, setAddTargetGroupId] = useState(null);
+  const [editingGroupId, setEditingGroupId] = useState(null);
+  const [editingGroupName, setEditingGroupName] = useState("");
   
   // 기본 상태: 모든 그룹이 펼쳐진 상태
   React.useEffect(() => {
@@ -40,9 +48,41 @@ function Group({
     setAddTargetGroupId(null);
   };
 
+  const handleStartRename = (e, group) => {
+    e.stopPropagation();
+    setEditingGroupId(group.id);
+    setEditingGroupName(group.name || "");
+  };
+
+  const handleSaveRename = async (e) => {
+    e?.stopPropagation();
+    if (!editingGroupId || !onUpdateGroupName) return;
+    const name = editingGroupName.trim();
+    if (!name) {
+      setEditingGroupId(null);
+      return;
+    }
+    try {
+      await onUpdateGroupName(editingGroupId, name, contentName);
+      setEditingGroupId(null);
+    } catch (err) {
+      console.error("그룹명 변경 실패:", err);
+    }
+  };
+
+  const handleCancelRename = (e) => {
+    e?.stopPropagation();
+    setEditingGroupId(null);
+  };
+
   return (
     <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4">
-      <h2 className="text-2xl font-bold mb-4">Group</h2>
+      <div className="flex items-center gap-2 mb-4">
+        <h2 className="text-2xl font-bold">Group</h2>
+        <span className="text-xs px-2 py-1 rounded font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+          Private
+        </span>
+      </div>
 
       {/* 그룹 생성 */}
       <div className="flex gap-2 mb-4">
@@ -106,6 +146,7 @@ function Group({
                 <div
                   className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   onClick={() => {
+                    if (editingGroupId === group.id) return;
                     if (isExpanded) {
                       setExpandedIds(expandedIds.filter(id => id !== group.id));
                     } else {
@@ -113,10 +154,34 @@ function Group({
                     }
                   }}
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {group.name}
-                    </span>
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    {editingGroupId === group.id ? (
+                      <div className="flex items-center gap-1 flex-1" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="text"
+                          value={editingGroupName}
+                          onChange={(e) => setEditingGroupName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleSaveRename();
+                            if (e.key === "Escape") handleCancelRename();
+                          }}
+                          onBlur={handleSaveRename}
+                          autoFocus
+                          className="flex-1 min-w-0 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleCancelRename}
+                          className="text-xs text-gray-500 hover:underline"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {group.name}
+                      </span>
+                    )}
                     {groupType && (
                       <span className={`text-xs px-1.5 py-0.5 rounded ${
                         group.isMyGroup
@@ -130,16 +195,41 @@ function Group({
                       (캐릭터 {members.length}명)
                     </span>
                   </div>
-                  <span className="text-xs text-gray-500">
-                    {isExpanded ? "▲" : "▼"}
-                  </span>
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    {group.isMyGroup && onUpdateGroupName && editingGroupId !== group.id && (
+                      <button
+                        type="button"
+                        onClick={(e) => handleStartRename(e, group)}
+                        className="text-xs text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
+                      >
+                        그룹 이름 변경
+                      </button>
+                    )}
+                    {group.isMyGroup && onRemoveGroup && editingGroupId !== group.id && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`"${group.name}" 그룹을 제거하시겠습니까?\n그룹 내 캐릭터 등록이 해제됩니다.`)) {
+                            onRemoveGroup(group.id);
+                          }
+                        }}
+                        className="text-xs text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:underline"
+                      >
+                        그룹 제거
+                      </button>
+                    )}
+                    <span className="text-xs text-gray-500">
+                      {isExpanded ? "▲" : "▼"}
+                    </span>
+                  </div>
                 </div>
 
                 {isExpanded && (
                   <div className="border-t border-gray-200 dark:border-gray-700 px-3 py-3 space-y-3">
                     {/* 등록된 캐릭터 */}
-                    <div className="space-y-1">
-                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    <div>
+                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                         등록된 캐릭터
                       </div>
                       {members.length === 0 ? (
@@ -147,29 +237,82 @@ function Group({
                           없음
                         </div>
                       ) : (
-                        members.map((char) => (
-                          <div
-                            key={char.id}
-                            className="flex items-center justify-between gap-2 px-2 py-1.5 bg-gray-50 dark:bg-gray-700/50 rounded text-sm"
-                          >
-                            <span className="text-gray-900 dark:text-white">
-                              {char.name}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // groupId는 char.groupNum (characters 안에 있는 groupId)
-                                // characterId는 char.id (선택한 캐릭터의 id)
-                                // contentName은 현재 페이지의 contentName
-                                onRemoveCharacter(char.groupNum, char.id, contentName);
-                              }}
-                              className="text-xs text-red-600 dark:text-red-400 hover:underline"
+                        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                          {members.map((char) => (
+                            <div
+                              key={char.id}
+                              className={`relative flex gap-4 p-4 rounded-xl shadow-sm transition-all duration-200 ${
+                                char.clearState
+                                  ? "bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-600 hover:shadow-md hover:border-green-400 dark:hover:border-green-500"
+                                  : "bg-amber-50/80 dark:bg-amber-900/15 border-2 border-amber-200 dark:border-amber-800 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700"
+                              }`}
                             >
-                              제거
-                            </button>
-                          </div>
-                        ))
+                              <div className="flex flex-col items-center flex-shrink-0">
+                                <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 ring-2 ring-gray-100 dark:ring-gray-600">
+                                  <span className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl font-bold text-gray-500 dark:text-gray-400">
+                                    {char.name.charAt(0) || "?"}
+                                  </span>
+                                  {char.image && (
+                                    <img
+                                      src={char.image}
+                                      alt={char.name}
+                                      className="relative w-full h-full object-cover object-[center_100%] scale-125"
+                                      onError={(e) => { e.target.style.display = "none"; }}
+                                    />
+                                  )}
+                                </div>
+                                {char.job && (
+                                  <span className="text-xs font-bold text-gray-900 dark:text-white mt-2 text-center truncate max-w-[4rem] sm:max-w-[4.5rem]">
+                                    {char.job}
+                                  </span>
+                                )}
+                                <div className="mt-2 flex items-center justify-center gap-1 flex-wrap">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onRemoveCharacter(char.groupNum, char.id, contentName);
+                                    }}
+                                    className="text-[10px] px-1.5 py-0.5 text-red-600 dark:text-red-400 hover:underline"
+                                  >
+                                    제거
+                                  </button>
+                                  {char.characterId && char.server && (
+                                    <a
+                                      href={`https://dundam.xyz/character?server=${toServerIdForUrl(char.server)}&key=${char.characterId}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 whitespace-nowrap"
+                                    >
+                                      던담이동
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="w-full text-center mb-2">
+                                  <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
+                                    {char.name}
+                                  </span>
+                                </div>
+                                <div className="flex flex-wrap items-center justify-center gap-1.5 mb-2">
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    명성 {char.value ?? 0}
+                                  </span>
+                                </div>
+                                <div className="text-center">
+                                  <EditableMemo
+                                    characterId={char.id}
+                                    memo={char.memo}
+                                    onSave={onMemoUpdate}
+                                    disabled={!canEditMemo}
+                                    className="block truncate"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       )}
                     </div>
 

@@ -35,6 +35,7 @@ const apiClient = axios.create({
         "Content-Type": "application/json",
     },
     timeout: 10000, // 10초 타임아웃
+    withCredentials: true, // 쿠키 자동 전달 (accessToken, refreshToken)
 });
 
 // 요청 인터셉터

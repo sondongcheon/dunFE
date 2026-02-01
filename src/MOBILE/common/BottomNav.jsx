@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "@/store/settingsSlice";
+import LoginModal from "@/PC/common/LoginModal";
 
 const NAV_ITEMS = [
   { path: "/", label: "홈", icon: "🏠" },
-  { path: "/test1", label: "Test1", icon: "📄" },
-  { path: "/test2", label: "공지", icon: "📢" },
+  { path: "/content", label: "컨텐츠", icon: "📋" },
+  { path: "/notice", label: "공지", icon: "📢" },
 ];
 
 function BottomNav() {
@@ -15,6 +16,31 @@ function BottomNav() {
   const dispatch = useDispatch();
   const darkMode = useSelector((state) => state.settings.darkMode);
   const [showMore, setShowMore] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [adventureName, setAdventureName] = useState("");
+
+  useEffect(() => {
+    const savedId = localStorage.getItem("adventureId");
+    const savedName = localStorage.getItem("adventureName");
+    if (savedId && savedName) {
+      setIsLoggedIn(true);
+      setAdventureName(savedName);
+    }
+  }, []);
+
+  const handleLoginSuccess = (result) => {
+    setIsLoggedIn(true);
+    setAdventureName(result.adventureName ?? "");
+    setShowLoginModal(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("adventureId");
+    localStorage.removeItem("adventureName");
+    setIsLoggedIn(false);
+    setAdventureName("");
+  };
 
   return (
     <>
@@ -45,6 +71,29 @@ function BottomNav() {
             );
           })}
 
+          {isLoggedIn ? (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 text-gray-500 dark:text-gray-400 transition-colors active:scale-95"
+              title={adventureName}
+            >
+              <span className="text-xl leading-none">👤</span>
+              <span className="text-[10px] font-medium truncate max-w-[3rem]" title={adventureName}>
+                {adventureName || "로그아웃"}
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowLoginModal(true)}
+              className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 text-gray-500 dark:text-gray-400 transition-colors active:scale-95"
+            >
+              <span className="text-xl leading-none">👤</span>
+              <span className="text-[10px] font-medium">로그인</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => setShowMore(!showMore)}
@@ -55,6 +104,12 @@ function BottomNav() {
           </button>
         </div>
       </nav>
+
+      <LoginModal
+        open={showLoginModal}
+        onOpenChange={setShowLoginModal}
+        onLoginSuccess={handleLoginSuccess}
+      />
 
       {/* 더보기 팝오버 */}
       {showMore && (

@@ -17,13 +17,19 @@ import { login } from "@/api/authApi";
  * 로그인 성공 시 쿠키로 accessToken, refreshToken이 전달됩니다.
  *
  * @param {function} onLoginSuccess - 로그인 성공 시 콜백
+ * @param {boolean} [open] - 제어 모드 시 열림 상태 (모바일 등 외부 트리거용)
+ * @param {function} [onOpenChange] - 제어 모드 시 열림 상태 변경 콜백
  */
-function LoginModal({ onLoginSuccess }) {
+function LoginModal({ onLoginSuccess, open: controlledOpen, onOpenChange }) {
   const [adventureName, setAdventureName] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const isControlled = controlledOpen !== undefined && typeof onOpenChange === "function";
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? onOpenChange : setInternalOpen;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,6 +61,9 @@ function LoginModal({ onLoginSuccess }) {
       setAdventureName("");
       setPassword("");
       setError(null);
+
+      // 로그인 성공 시 페이지 리로드 (상태/캐시 동기화)
+      window.location.reload();
     } catch (err) {
       // 에러 처리
       setError(err.message || "로그인에 실패했습니다.");
@@ -77,11 +86,13 @@ function LoginModal({ onLoginSuccess }) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <button className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-          로그인
-        </button>
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <button className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            로그인
+          </button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-6">
         <DialogHeader>
           <DialogTitle>로그인</DialogTitle>

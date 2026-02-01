@@ -23,6 +23,7 @@ function Group({
   onRemoveGroup,
   canEditMemo = false,
 }) {
+  const [sectionExpanded, setSectionExpanded] = useState(true);
   const [newGroupName, setNewGroupName] = useState("");
   const [expandedIds, setExpandedIds] = useState([]);
   const [addTargetGroupId, setAddTargetGroupId] = useState(null);
@@ -77,13 +78,27 @@ function Group({
 
   return (
     <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4">
-      <div className="flex items-center gap-2 mb-4">
-        <h2 className="text-2xl font-bold">Group</h2>
-        <span className="text-xs px-2 py-1 rounded font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-          Private
+      <div
+        className="flex items-center justify-between mb-4 cursor-pointer select-none"
+        onClick={() => setSectionExpanded((e) => !e)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && setSectionExpanded((v) => !v)}
+        aria-expanded={sectionExpanded}
+      >
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold">Group</h2>
+          <span className="text-xs px-2 py-1 rounded font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+            Private
+          </span>
+        </div>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
+          {sectionExpanded ? "▼" : "▲"}
         </span>
       </div>
 
+      {sectionExpanded && (
+      <>
       {/* 그룹 생성 */}
       <div className="flex gap-2 mb-4">
         <input
@@ -144,7 +159,7 @@ function Group({
                 className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
               >
                 <div
-                  className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="flex flex-col gap-y-1 md:flex-row md:flex-wrap md:items-center md:justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   onClick={() => {
                     if (editingGroupId === group.id) return;
                     if (isExpanded) {
@@ -154,9 +169,10 @@ function Group({
                     }
                   }}
                 >
+                  {/* 이름 + 배지 + 인원 (모바일 1줄, PC 동일 줄) */}
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     {editingGroupId === group.id ? (
-                      <div className="flex items-center gap-1 flex-1" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-1 flex-1 min-w-0" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="text"
                           value={editingGroupName}
@@ -172,35 +188,38 @@ function Group({
                         <button
                           type="button"
                           onClick={handleCancelRename}
-                          className="text-xs text-gray-500 hover:underline"
+                          className="text-xs text-gray-500 hover:underline whitespace-nowrap"
                         >
                           취소
                         </button>
                       </div>
                     ) : (
-                      <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                        {group.name}
-                      </span>
+                      <>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {group.name}
+                        </span>
+                        {groupType && (
+                          <span className={`text-xs px-1.5 py-0.5 rounded flex-shrink-0 ${
+                            group.isMyGroup
+                              ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
+                              : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                          }`}>
+                            {groupType}
+                          </span>
+                        )}
+                        <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+                          (캐릭터 {members.length}명)
+                        </span>
+                      </>
                     )}
-                    {groupType && (
-                      <span className={`text-xs px-1.5 py-0.5 rounded ${
-                        group.isMyGroup
-                          ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                          : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
-                      }`}>
-                        {groupType}
-                      </span>
-                    )}
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      (캐릭터 {members.length}명)
-                    </span>
                   </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  {/* 이름변경, 제거, 접기 (모바일 2줄, PC 한 줄) */}
+                  <div className="flex items-center gap-2 mt-1 md:mt-0 flex-shrink-0 md:ml-auto">
                     {group.isMyGroup && onUpdateGroupName && editingGroupId !== group.id && (
                       <button
                         type="button"
                         onClick={(e) => handleStartRename(e, group)}
-                        className="text-xs text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
+                        className="text-xs text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:underline whitespace-nowrap"
                       >
                         그룹 이름 변경
                       </button>
@@ -214,12 +233,12 @@ function Group({
                             onRemoveGroup(group.id);
                           }
                         }}
-                        className="text-xs text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:underline"
+                        className="text-xs text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:underline whitespace-nowrap"
                       >
                         그룹 제거
                       </button>
                     )}
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 ml-auto">
                       {isExpanded ? "▲" : "▼"}
                     </span>
                   </div>
@@ -262,7 +281,7 @@ function Group({
                                   )}
                                 </div>
                                 {char.job && (
-                                  <span className="text-xs font-bold text-gray-900 dark:text-white mt-2 text-center truncate max-w-[4rem] sm:max-w-[4.5rem]">
+                                  <span className="text-xs font-bold text-gray-900 dark:text-white mt-2 text-center truncate max-w-[5rem] sm:max-w-[5.5rem]">
                                     {char.job}
                                   </span>
                                 )}
@@ -369,6 +388,8 @@ function Group({
           })
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }

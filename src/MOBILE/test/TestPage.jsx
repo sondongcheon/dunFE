@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { CONTENT_IDS } from "@/PC/content/constants";
+import { CONTENT_IDS, CONTENT_BG_IMAGES } from "@/PC/content/constants";
+import neopleLogo from "@/Assets/기술표기_가로형_color.png";
 
 function TestPage() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ function TestPage() {
             시작하기
           </button>
           <button
-            onClick={() => navigate("/test2")}
+            onClick={() => navigate("/notice")}
             className="px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg active:bg-gray-50 dark:active:bg-gray-800 transition-colors"
           >
             공지사항
@@ -81,11 +82,21 @@ function TestPage() {
             <button
               key={key}
               onClick={() => navigate(`/content/${key}`)}
-              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-center active:border-blue-400 dark:active:border-blue-500 transition-all"
+              className="flex flex-col min-h-[72px] p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg active:border-blue-400 dark:active:border-blue-500 transition-all"
             >
-              <span className="text-sm font-medium text-gray-900 dark:text-white">
-                {value}
-              </span>
+              <div
+                className="flex-1 min-h-0 rounded-lg overflow-hidden w-full relative"
+                style={{
+                  backgroundImage: CONTENT_BG_IMAGES[key] ? `url(${CONTENT_BG_IMAGES[key]})` : undefined,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                <span className="absolute inset-0 bg-black/50 rounded-lg" aria-hidden />
+                <span className="relative z-10 flex items-center justify-center min-h-[60px] p-1.5 text-sm font-medium text-white text-center">
+                  {value}
+                </span>
+              </div>
             </button>
           ))}
         </div>
@@ -101,9 +112,17 @@ function TestPage() {
 
       {/* 푸터 */}
       <footer className="text-center py-6 border-t border-gray-200 dark:border-gray-700">
-        <p className="text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
           © 2026 DunRoot
         </p>
+        <a
+          href="http://developers.neople.co.kr"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block"
+        >
+          <img src={neopleLogo} alt="Neople 오픈 API" className="h-5 mx-auto" />
+        </a>
       </footer>
     </div>
   );

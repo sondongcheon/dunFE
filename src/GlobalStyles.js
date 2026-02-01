@@ -6,7 +6,6 @@ const GlobalStyles = createGlobalStyle`
     min-height: 100vh;
     margin: 0;
     padding: 0;
-    border: 2px solid black; /* 상태 구분용 */
     background-color: ${({ theme }) => theme.darkMode ? "rgb(46, 44, 34)" : "white"};
     color: ${({ theme }) => theme.darkMode ? "#ffffff" : "#000000"};
     font-family: "Pretendard", -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -21,7 +20,6 @@ const GlobalStyles = createGlobalStyle`
 
   /* PC용 메인 컨테이너 (웹앱과 무관, 상단 고정 Nav 높이만큼 여백) */
   .mainbody {
-    border: 2px solid black; /* 상태 구분용 */
     width: 70%;
     max-width: 1400px;
     min-height: 100vh;
@@ -43,7 +41,6 @@ const GlobalStyles = createGlobalStyle`
   /* 모바일/웹앱용 메인 컨테이너 (하단 Nav 높이 반영) */
   .mainMobileBody {
     width: 100%;
-    border: 2px solid black; /* 상태 구분용 */
     max-width: 480px;
     min-height: 100vh;
     margin: 0 auto;

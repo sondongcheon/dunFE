@@ -5,7 +5,8 @@ const NOTICES = [
   {
     id: 1,
     title: "DunRoot 서비스 오픈 안내",
-    content: "안녕하세요. DunRoot 서비스가 정식 오픈되었습니다.\n\n던전앤파이터 유저들을 위한 파티/그룹 관리 서비스를 이용해 주세요.\n\n감사합니다.",
+    content:
+      "안녕하세요. DunRoot 서비스가 임시 오픈되었습니다.\n\n던전앤파이터 유저들을 위한 파티/그룹 관리 서비스를 이용해 주세요.\n\n감사합니다.",
     date: "2026-02-01",
     important: true,
   },
@@ -22,7 +23,7 @@ function Test2Page() {
     <div className="mainbody">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">공지사항</h1>
-        
+
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
           {/* 헤더 */}
           <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -53,9 +54,7 @@ function Test2Page() {
                         중요
                       </span>
                     )}
-                    <span className="text-gray-900 dark:text-white truncate">
-                      {notice.title}
-                    </span>
+                    <span className="text-gray-900 dark:text-white truncate">{notice.title}</span>
                   </span>
                 </div>
                 <div className="col-span-3 text-center text-sm text-gray-500 dark:text-gray-400">

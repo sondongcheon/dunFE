@@ -1,4 +1,23 @@
-/** 
+import azure_mainBg from "@/Assets/azure_main.jpg";
+import goddess_of_death_templeBg from "@/Assets/goddess_of_death_temple.jpg";
+import venus_goddess_of_beautyBg from "@/Assets/venus_goddess_of_beauty.jpg";
+import nabelBg from "@/Assets/nabel.jpg";
+import inaeBg from "@/Assets/inae.jpg";
+import diregieBg from "@/Assets/diregie.jpg";
+
+/**
+ * content별 배경 이미지 (CONTENT_IDS key와 동일한 이름의 Assets 파일)
+ */
+export const CONTENT_BG_IMAGES = {
+    azure_main: azure_mainBg,
+    goddess_of_death_temple: goddess_of_death_templeBg,
+    venus_goddess_of_beauty: venus_goddess_of_beautyBg,
+    nabel: nabelBg,
+    inae: inaeBg,
+    diregie: diregieBg,
+};
+
+/**
  * content 페이지 path variable
  * key: 경로에 사용 (예: /content/azure_main)
  * value: 화면에 표시되는 텍스트

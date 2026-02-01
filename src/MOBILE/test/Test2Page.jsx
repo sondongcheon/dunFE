@@ -5,7 +5,8 @@ const NOTICES = [
   {
     id: 1,
     title: "DunRoot 서비스 오픈 안내",
-    content: "안녕하세요. DunRoot 서비스가 정식 오픈되었습니다.\n\n던전앤파이터 유저들을 위한 파티/그룹 관리 서비스를 이용해 주세요.\n\n감사합니다.",
+    content:
+      "안녕하세요. DunRoot 서비스가 임시 오픈되었습니다.\n\n던전앤파이터 유저들을 위한 파티/그룹 관리 서비스를 이용해 주세요.\n\n감사합니다.",
     date: "2026-02-01",
     important: true,
   },
@@ -19,9 +20,9 @@ function Test2Page() {
   };
 
   return (
-    <div className="mainbody pb-20">
+    <div className="mainMobileBody pb-20">
       <h1 className="text-xl font-bold mb-4">공지사항</h1>
-      
+
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
         {/* 공지사항 목록 */}
         {NOTICES.map((notice) => (
@@ -45,9 +46,7 @@ function Test2Page() {
                   {notice.title}
                 </span>
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
-                {notice.date}
-              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">{notice.date}</div>
             </div>
 
             {/* 상세 내용 (펼쳤을 때) */}

@@ -14,7 +14,7 @@ const MenuDropdown = () => {
           📄 Test1
         </p>
         <p 
-          onClick={() => navigate("/test2")}
+          onClick={() => navigate("/notice")}
           className="cursor-pointer hover:underline py-2"
         >
           📄 공지사항

@@ -11,6 +11,8 @@ import PCContentDetailPage from "@/PC/content/contentDetail";
 import MobileTestPage from "./MOBILE/test/TestPage";
 import MobileTest1Page from "./MOBILE/test/Test1Page";
 import MobileTest2Page from "./MOBILE/test/Test2Page";
+import MobileContentMainPage from "./MOBILE/content/contentMain";
+import MobileContentDetailPage from "./MOBILE/content/contentDetail";
 
 // PC 헤더 / 모바일 하단 Nav
 import PCMainNav from "./PC/common/MainNav";
@@ -32,9 +34,9 @@ const isMobileDomain = () => {
 const ROUTE_MAP = [
   { path: "/", PC: PCTestPage, MOBILE: MobileTestPage },
   { path: "/test1", PC: PCTest1Page, MOBILE: MobileTest1Page },
-  { path: "/test2", PC: PCTest2Page, MOBILE: MobileTest2Page },
-  { path: "/content", PC: PCContentMainPage, MOBILE: PCContentMainPage },
-  { path: "/content/:id", PC: PCContentDetailPage, MOBILE: PCContentDetailPage },
+  { path: "/notice", PC: PCTest2Page, MOBILE: MobileTest2Page },
+  { path: "/content", PC: PCContentMainPage, MOBILE: MobileContentMainPage },
+  { path: "/content/:id", PC: PCContentDetailPage, MOBILE: MobileContentDetailPage },
 ];
 
 function Router() {

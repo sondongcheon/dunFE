@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import ContentSidebar from "./components/ContentSidebar";
-import { CONTENT_IDS } from "./constants";
+import { CONTENT_IDS, CONTENT_BG_IMAGES } from "./constants";
 
 /**
  * content 메인 페이지 (path variable 없을 때)
@@ -20,9 +20,21 @@ function ContentMain() {
               <Link
                 key={key}
                 to={`/content/${key}`}
-                className="px-6 py-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-center font-medium text-gray-900 dark:text-white"
+                className="flex flex-col min-h-[100px] p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-all"
               >
-                {value}
+                <div
+                  className="flex-1 min-h-0 rounded-lg overflow-hidden w-full relative flex items-center justify-center"
+                  style={{
+                    backgroundImage: CONTENT_BG_IMAGES[key] ? `url(${CONTENT_BG_IMAGES[key]})` : undefined,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center 15%",
+                  }}
+                >
+                  <span className="absolute inset-0 bg-black/50 rounded-lg" aria-hidden />
+                  <span className="relative z-10 text-center text-base font-medium text-white px-4 py-2">
+                    {value}
+                  </span>
+                </div>
               </Link>
             ))}
           </div>

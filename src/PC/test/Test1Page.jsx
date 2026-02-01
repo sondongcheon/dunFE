@@ -8,7 +8,7 @@ function Test1Page() {
       <p className="size-font-sm">PC 전용 Test1 콘텐츠입니다.</p>
       <nav className="size-font-xxs mt-4">
         <Link to="/" className="normalBtm mr-2">메인</Link>
-        <Link to="/test2" className="normalBtm">공지사항</Link>
+        <Link to="/notice" className="normalBtm">공지사항</Link>
       </nav>
     </div>
   );

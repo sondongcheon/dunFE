@@ -45,6 +45,7 @@ function Party({
   onUpdatePartyGroupName,
   canEditMemo = false,
 }) {
+  const [sectionExpanded, setSectionExpanded] = useState(true);
   const [newPartyName, setNewPartyName] = useState("");
   const [newPartyPassword, setNewPartyPassword] = useState("");
   const [createPartyPasswordError, setCreatePartyPasswordError] = useState("");
@@ -243,13 +244,27 @@ function Party({
 
   return (
     <div className="border-2 border-purple-200 dark:border-purple-700 rounded-lg p-4">
-      <div className="flex items-center gap-2 mb-4">
-        <h2 className="text-2xl font-bold">Party</h2>
-        <span className="text-xs px-2 py-1 rounded font-medium bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
-          Public
+      <div
+        className="flex items-center justify-between mb-4 cursor-pointer select-none"
+        onClick={() => setSectionExpanded((e) => !e)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && setSectionExpanded((v) => !v)}
+        aria-expanded={sectionExpanded}
+      >
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold">Party</h2>
+          <span className="text-xs px-2 py-1 rounded font-medium bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
+            Public
+          </span>
+        </div>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
+          {sectionExpanded ? "▼" : "▲"}
         </span>
       </div>
 
+      {sectionExpanded && (
+      <>
       {/* 파티 생성 */}
       <div className="mb-4">
         <div className="flex gap-2 flex-wrap items-center">
@@ -371,15 +386,16 @@ function Party({
               >
                 {/* 파티 헤더 */}
                 <div
-                  className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors"
+                  className="flex flex-col gap-y-1 md:flex-row md:flex-wrap md:items-center md:justify-between px-3 py-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors"
                   onClick={() => {
                     if (editingPartyId === party.id) return;
                     toggleParty(party.id);
                   }}
                 >
+                  {/* 이름 + 배지 + 인원 (모바일 1줄, PC 동일 줄) */}
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     {editingPartyId === party.id ? (
-                      <div className="flex items-center gap-1 flex-1" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-1 flex-1 min-w-0" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="text"
                           value={editingPartyName}
@@ -395,7 +411,7 @@ function Party({
                         <button
                           type="button"
                           onClick={handleCancelPartyRename}
-                          className="text-xs text-gray-500 hover:underline"
+                          className="text-xs text-gray-500 hover:underline whitespace-nowrap"
                         >
                           취소
                         </button>
@@ -421,12 +437,13 @@ function Party({
                       </>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  {/* 이름변경, 삭제, 접기 (모바일 2줄, PC 한 줄) */}
+                  <div className="flex items-center gap-2 mt-1 md:mt-0 flex-shrink-0 md:ml-auto">
                     {isMyParty && onUpdatePartyName && editingPartyId !== party.id && (
                       <button
                         type="button"
                         onClick={(e) => handleStartPartyRename(e, party)}
-                        className="text-xs text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 hover:underline"
+                        className="text-xs text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 hover:underline whitespace-nowrap"
                       >
                         파티 이름 변경
                       </button>
@@ -440,12 +457,12 @@ function Party({
                             onRemoveParty(party.id);
                           }
                         }}
-                        className="text-xs text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:underline"
+                        className="text-xs text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:underline whitespace-nowrap"
                       >
                         파티 삭제
                       </button>
                     )}
-                    <span className="text-xs text-gray-500">{isPartyExpanded ? "▲" : "▼"}</span>
+                    <span className="text-xs text-gray-500 ml-auto">{isPartyExpanded ? "▲" : "▼"}</span>
                   </div>
                 </div>
 
@@ -612,16 +629,17 @@ function Party({
                             >
                               {/* 그룹 헤더 */}
                               <div
-                                className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                className="flex flex-col gap-y-1 md:flex-row md:flex-wrap md:items-center md:justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                                 onClick={(e) => {
                                   if (editingPartyGroupId === group.id) return;
                                   e.stopPropagation();
                                   toggleGroup(group.id);
                                 }}
                               >
+                                {/* 이름 + 인원 (모바일 1줄, PC 동일 줄) */}
                                 <div className="flex items-center gap-2 flex-1 min-w-0">
                                   {editingPartyGroupId === group.id ? (
-                                    <div className="flex items-center gap-1 flex-1" onClick={(e) => e.stopPropagation()}>
+                                    <div className="flex items-center gap-1 flex-1 min-w-0" onClick={(e) => e.stopPropagation()}>
                                       <input
                                         type="text"
                                         value={editingPartyGroupName}
@@ -637,7 +655,7 @@ function Party({
                                       <button
                                         type="button"
                                         onClick={handleCancelPartyGroupRename}
-                                        className="text-xs text-gray-500 hover:underline"
+                                        className="text-xs text-gray-500 hover:underline whitespace-nowrap"
                                       >
                                         취소
                                       </button>
@@ -653,12 +671,13 @@ function Party({
                                     </>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-3 flex-shrink-0">
+                                {/* 이름변경, 삭제, 접기 (모바일 2줄, PC 한 줄) */}
+                                <div className="flex items-center gap-2 mt-1 md:mt-0 flex-shrink-0 md:ml-auto">
                                   {onUpdatePartyGroupName && editingPartyGroupId !== group.id && (
                                     <button
                                       type="button"
                                       onClick={(e) => handleStartPartyGroupRename(e, group)}
-                                      className="text-xs text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 hover:underline"
+                                      className="text-xs text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 hover:underline whitespace-nowrap"
                                     >
                                       파티 그룹 이름 변경
                                     </button>
@@ -672,12 +691,12 @@ function Party({
                                           onRemovePartyGroup(group.id);
                                         }
                                       }}
-                                      className="text-xs text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:underline"
+                                      className="text-xs text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:underline whitespace-nowrap"
                                     >
                                       파티 그룹 삭제
                                     </button>
                                   )}
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-xs text-gray-500 ml-auto">
                                     {isGroupExpanded ? "▲" : "▼"}
                                   </span>
                                 </div>
@@ -741,7 +760,7 @@ function Party({
                                                   )}
                                                 </div>
                                                 {(member.job || charFromList?.job) && (
-                                                  <span className="text-xs font-bold text-gray-900 dark:text-white mt-2 text-center truncate max-w-[4rem] sm:max-w-[4.5rem]">
+                                                  <span className="text-xs font-bold text-gray-900 dark:text-white mt-2 text-center truncate max-w-[5rem] sm:max-w-[5.5rem]">
                                                     {member.job ?? charFromList?.job}
                                                   </span>
                                                 )}
@@ -881,6 +900,8 @@ function Party({
           })
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }

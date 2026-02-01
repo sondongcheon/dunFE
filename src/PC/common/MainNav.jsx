@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "@/store/settingsSlice";
 import LoginModal from "./LoginModal";
 import CharacterAddModal from "./CharacterAddModal";
-import { CONTENT_IDS } from "@/PC/content/constants";
+import { CONTENT_IDS, CONTENT_BG_IMAGES } from "@/PC/content/constants";
 
 const NAV_ITEMS = [
   { path: "/", label: "홈" },
   { path: "/content", label: "컨텐츠", hasSubmenu: true },
-  { path: "/test2", label: "공지사항" },
+  { path: "/notice", label: "공지사항" },
 ];
 
 function MainNav() {
@@ -125,13 +125,34 @@ function MainNav() {
                           {Object.entries(CONTENT_IDS).map(([key, value]) => (
                             <div
                               key={key}
-                              className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                              role="button"
+                              tabIndex={0}
+                              className="flex flex-col min-h-[52px] p-1 border border-gray-200 dark:border-gray-700 rounded-lg mx-2 mb-1 cursor-pointer transition-opacity hover:opacity-90"
                               onClick={() => {
                                 navigate(`/content/${key}`);
                                 setHoveredNav(null);
                               }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  navigate(`/content/${key}`);
+                                  setHoveredNav(null);
+                                }
+                              }}
                             >
-                              {value}
+                              <div
+                                className="flex-1 min-h-0 rounded-lg overflow-hidden w-full relative"
+                                style={{
+                                  backgroundImage: CONTENT_BG_IMAGES[key] ? `url(${CONTENT_BG_IMAGES[key]})` : undefined,
+                                  backgroundSize: "cover",
+                                  backgroundPosition: "center 15%",
+                                }}
+                              >
+                                <span className="absolute inset-0 bg-black/50 rounded-lg" aria-hidden />
+                                <span className="relative z-10 flex items-center px-4 py-2 text-base font-medium text-white">
+                                  {value}
+                                </span>
+                              </div>
                             </div>
                           ))}
                         </nav>

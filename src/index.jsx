@@ -20,7 +20,9 @@ if (typeof window !== "undefined" && isMobileUserAgent) {
 
   // 이미 모바일 서브도메인(m.xxx)이면 스킵
   if (!hostname.startsWith("m.")) {
-    const mobileOrigin = `${protocol}//m.${hostname}${port ? `:${port}` : ""}`;
+    // www.dunroot.com → dunroot.com, dunroot.com → dunroot.com (m. 붙일 베이스 도메인)
+    const baseHost = hostname.startsWith("www.") ? hostname.slice(4) : hostname;
+    const mobileOrigin = `${protocol}//m.${baseHost}${port ? `:${port}` : ""}`;
     window.location.replace(`${mobileOrigin}${pathname}${search}${hash}`);
   }
 }

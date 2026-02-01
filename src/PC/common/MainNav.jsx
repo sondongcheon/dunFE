@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "@/store/settingsSlice";
 import LoginModal from "./LoginModal";
 import CharacterAddModal from "./CharacterAddModal";
+import { CONTENT_IDS } from "@/PC/content/constants";
 
 const NAV_ITEMS = [
   { path: "/", label: "홈" },
-  { path: "/content", label: "content" },
-  { path: "/test2", label: "Test2" },
-  { path: "/test3", label: "Test3" },
+  { path: "/content", label: "컨텐츠", hasSubmenu: true },
+  { path: "/test2", label: "공지사항" },
 ];
 
 function MainNav() {
@@ -54,7 +54,7 @@ function MainNav() {
             className="text-2xl font-bold text-gray-800 dark:text-white font-a cursor-pointer"
             onClick={() => navigate("/")}
           >
-            DNF Project
+            DunRoot
           </h1>
 
           {/* 우측 버튼들 */}
@@ -113,19 +113,41 @@ function MainNav() {
                   {/* 호버 시 하단 드롭다운 */}
                   {hoveredNav === item.path && (
                     <div 
-                      className="absolute top-full left-0 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg pt-1 pb-2 z-50"
+                      className="absolute top-full left-0 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2 z-50"
                       onMouseEnter={() => setHoveredNav(item.path)}
                       onMouseLeave={() => setHoveredNav(null)}
                     >
-                      <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
-                        {item.label} 메뉴
-                      </div>
-                      <div 
-                        className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
-                        onClick={() => navigate(item.path)}
-                      >
-                        {item.label} 페이지로 이동
-                      </div>
+                      {item.hasSubmenu ? (
+                        <nav className="space-y-1">
+                          <div className="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                            컨텐츠 목록
+                          </div>
+                          {Object.entries(CONTENT_IDS).map(([key, value]) => (
+                            <div
+                              key={key}
+                              className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                              onClick={() => {
+                                navigate(`/content/${key}`);
+                                setHoveredNav(null);
+                              }}
+                            >
+                              {value}
+                            </div>
+                          ))}
+                        </nav>
+                      ) : (
+                        <>
+                          <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                            {item.label} 메뉴
+                          </div>
+                          <div 
+                            className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                            onClick={() => navigate(item.path)}
+                          >
+                            {item.label} 페이지로 이동
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </li>

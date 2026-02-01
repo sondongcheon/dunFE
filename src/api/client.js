@@ -26,7 +26,7 @@
 import axios from "axios";
 
 // .env에서 API 베이스 URL 가져오기 (없으면 기본값 사용)
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/api";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8090/api";
 
 // axios 인스턴스 생성
 const apiClient = axios.create({

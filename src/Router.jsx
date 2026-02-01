@@ -4,7 +4,6 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import PCTestPage from "./PC/test/TestPage";
 import PCTest1Page from "./PC/test/Test1Page";
 import PCTest2Page from "./PC/test/Test2Page";
-import PCTest3Page from "./PC/test/Test3Page";
 import PCContentMainPage from "@/PC/content/contentMain";
 import PCContentDetailPage from "@/PC/content/contentDetail";
 
@@ -12,7 +11,6 @@ import PCContentDetailPage from "@/PC/content/contentDetail";
 import MobileTestPage from "./MOBILE/test/TestPage";
 import MobileTest1Page from "./MOBILE/test/Test1Page";
 import MobileTest2Page from "./MOBILE/test/Test2Page";
-import MobileTest3Page from "./MOBILE/test/Test3Page";
 
 // PC 헤더 / 모바일 하단 Nav
 import PCMainNav from "./PC/common/MainNav";
@@ -35,7 +33,6 @@ const ROUTE_MAP = [
   { path: "/", PC: PCTestPage, MOBILE: MobileTestPage },
   { path: "/test1", PC: PCTest1Page, MOBILE: MobileTest1Page },
   { path: "/test2", PC: PCTest2Page, MOBILE: MobileTest2Page },
-  { path: "/test3", PC: PCTest3Page, MOBILE: MobileTest3Page },
   { path: "/content", PC: PCContentMainPage, MOBILE: PCContentMainPage },
   { path: "/content/:id", PC: PCContentDetailPage, MOBILE: PCContentDetailPage },
 ];

@@ -6,8 +6,7 @@ import { toggleDarkMode } from "@/store/settingsSlice";
 const NAV_ITEMS = [
   { path: "/", label: "홈", icon: "🏠" },
   { path: "/test1", label: "Test1", icon: "📄" },
-  { path: "/test2", label: "Test2", icon: "📄" },
-  { path: "/test3", label: "Test3", icon: "📄" },
+  { path: "/test2", label: "공지", icon: "📢" },
 ];
 
 function BottomNav() {

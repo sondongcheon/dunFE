@@ -17,13 +17,7 @@ const MenuDropdown = () => {
           onClick={() => navigate("/test2")}
           className="cursor-pointer hover:underline py-2"
         >
-          📄 Test2
-        </p>
-        <p 
-          onClick={() => navigate("/test3")}
-          className="cursor-pointer hover:underline py-2"
-        >
-          📄 Test3
+          📄 공지사항
         </p>
       </div>
     </div>

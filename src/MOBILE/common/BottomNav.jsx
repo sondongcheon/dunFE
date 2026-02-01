@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "@/store/settingsSlice";
 import LoginModal from "@/PC/common/LoginModal";
+import CharacterAddModal from "@/PC/common/CharacterAddModal";
 
 const NAV_ITEMS = [
   { path: "/", label: "홈", icon: "🏠" },
@@ -17,6 +18,7 @@ function BottomNav() {
   const darkMode = useSelector((state) => state.settings.darkMode);
   const [showMore, setShowMore] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showCharacterAddModal, setShowCharacterAddModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adventureName, setAdventureName] = useState("");
 
@@ -111,6 +113,12 @@ function BottomNav() {
         onLoginSuccess={handleLoginSuccess}
       />
 
+      <CharacterAddModal
+        open={showCharacterAddModal}
+        onOpenChange={setShowCharacterAddModal}
+        showTrigger={false}
+      />
+
       {/* 더보기 팝오버 */}
       {showMore && (
         <>
@@ -125,6 +133,19 @@ function BottomNav() {
             aria-label="더보기 메뉴"
           >
             <div className="p-4 space-y-2">
+              {isLoggedIn && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCharacterAddModal(true);
+                    setShowMore(false);
+                  }}
+                  className="w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
+                >
+                  <span>캐릭터 추가</span>
+                  <span aria-hidden>+</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {

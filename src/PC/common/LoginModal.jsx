@@ -102,10 +102,9 @@ function LoginModal({ onLoginSuccess, open: controlledOpen, onOpenChange }) {
             처음 이용시 좌측 캐릭터 추가를 하면
             <br />
             로그인 정보가 자동으로 생성됩니다.
-            <br />
-            초기 비밀번호는 공백이므로
-            <br />
-            비밀번호 입력 없이 로그인해 주세요
+            <br /> <br />
+            초기 비밀번호는 [1234] 입니다.
+
           </DialogDescription>
         </DialogHeader>
 

@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "DunRoot",
+  "name": "DunRoot - 던전앤파이터 파티 & 그룹 관리",
+  "description": "던전앤파이터 파티 & 그룹 관리 서비스",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,7 @@
   ],
   "start_url": ".",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "theme_color": "#000000",
   "background_color": "#ffffff"
 }

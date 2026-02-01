@@ -25,13 +25,20 @@ const SERVERS = [
 
 /**
  * 캐릭터 추가 모달 컴포넌트
+ * @param {boolean} [open] - 제어 모드일 때 열림 상태 (모바일 등 외부에서 열 때 사용)
+ * @param {function} [onOpenChange] - 제어 모드일 때 열림 상태 변경 콜백
+ * @param {boolean} [showTrigger=true] - false면 트리거 버튼 미렌더 (제어 모드 전용)
  */
-function CharacterAddModal() {
+function CharacterAddModal({ open: controlledOpen, onOpenChange: controlledOnOpenChange, showTrigger = true }) {
   const [input, setInput] = useState("");
   const [selectedServerId, setSelectedServerId] = useState("");
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const isControlled = controlledOpen !== undefined && controlledOnOpenChange != null;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? controlledOnOpenChange : setInternalOpen;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,11 +88,13 @@ function CharacterAddModal() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <button className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-          캐릭터 추가
-        </button>
-      </DialogTrigger>
+      {showTrigger && (
+        <DialogTrigger asChild>
+          <button className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            캐릭터 추가
+          </button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-6">
         <DialogHeader>
           <DialogTitle>캐릭터 추가</DialogTitle>

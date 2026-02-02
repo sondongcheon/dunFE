@@ -151,7 +151,7 @@ function Characters({
         </div>
       </div>
       {sectionExpanded && (
-        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
           {displayCharacters.length === 0 ? (
             <div className="col-span-full text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
               {filterMode === "exclude"

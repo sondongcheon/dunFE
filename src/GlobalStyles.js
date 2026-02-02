@@ -51,7 +51,7 @@ const GlobalStyles = createGlobalStyle`
   /* 모바일/웹앱용 메인 컨테이너 (하단 Nav 높이 반영) */
   .mainMobileBody {
     width: 100%;
-    max-width: 480px;
+    max-width: 640px;
     min-height: 100vh;
     margin: 0 auto;
     margin-top: 20px;

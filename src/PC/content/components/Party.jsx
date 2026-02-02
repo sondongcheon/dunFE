@@ -743,7 +743,7 @@ function Party({
                                             없음
                                           </div>
                                         ) : (
-                                          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+                                          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                                             {members.map((member) => {
                                               // member.id: 내 데이터의 내부 ID, member.characterId: 네오플 ID
                                               const myInternalId = member.id ?? member.characterId;

@@ -133,19 +133,17 @@ function BottomNav() {
             aria-label="더보기 메뉴"
           >
             <div className="p-4 space-y-2">
-              {isLoggedIn && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowCharacterAddModal(true);
-                    setShowMore(false);
-                  }}
-                  className="w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
-                >
-                  <span>캐릭터 추가</span>
-                  <span aria-hidden>+</span>
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCharacterAddModal(true);
+                  setShowMore(false);
+                }}
+                className="w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
+              >
+                <span>캐릭터 추가</span>
+                <span aria-hidden>+</span>
+              </button>
               <button
                 type="button"
                 onClick={() => {

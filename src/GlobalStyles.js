@@ -29,6 +29,16 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
   }
 
+  /* sm~md(1024px 미만): 전체 화면 좌우 여백 없음(모바일과 동일) */
+  @media (max-width: 1023px) {
+    .mainbody {
+      width: 100%;
+      max-width: 100%;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
   /* PC 환경 body 스타일 (고정 너비, 웹앱 최적화 불필요) */
   @media (min-width: 1025px) {
     body {

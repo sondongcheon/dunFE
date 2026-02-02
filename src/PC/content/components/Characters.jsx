@@ -61,7 +61,7 @@ function Characters({
 
   if (loading) {
     return (
-      <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg py-4 px-0 lg:px-4">
+      <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4">
         <div
           className="flex items-center justify-between mb-4 cursor-pointer select-none"
           onClick={() => setSectionExpanded((e) => !e)}
@@ -84,7 +84,7 @@ function Characters({
 
   if (!characters.length) {
     return (
-      <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg py-4 px-0 lg:px-4">
+      <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4">
         <div
           className="flex items-center justify-between mb-4 cursor-pointer select-none"
           onClick={() => setSectionExpanded((e) => !e)}
@@ -108,7 +108,7 @@ function Characters({
   const hasAdded = addedCharacterIds && addedCharacterIds.size > 0;
 
   return (
-    <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg py-4 px-0 lg:px-4">
+    <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4">
       <div
         className="flex items-center justify-between mb-4 cursor-pointer select-none"
         onClick={() => setSectionExpanded((e) => !e)}

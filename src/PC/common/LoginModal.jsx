@@ -104,7 +104,6 @@ function LoginModal({ onLoginSuccess, open: controlledOpen, onOpenChange }) {
             로그인 정보가 자동으로 생성됩니다.
             <br /> <br />
             초기 비밀번호는 [1234] 입니다.
-
           </DialogDescription>
         </DialogHeader>
 
@@ -159,7 +158,7 @@ function LoginModal({ onLoginSuccess, open: controlledOpen, onOpenChange }) {
               <button
                 type="button"
                 disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 mr-4 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 취소
               </button>
@@ -167,7 +166,7 @@ function LoginModal({ onLoginSuccess, open: controlledOpen, onOpenChange }) {
             <button
               type="submit"
               disabled={loading || !adventureName.trim()}
-              className="px-4 py-2 ml-4 text-sm font-medium text-white bg-gray-800 dark:bg-gray-600 rounded-md hover:bg-gray-700 dark:hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2  text-sm font-medium text-white bg-gray-800 dark:bg-gray-600 rounded-md hover:bg-gray-700 dark:hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "로그인 중..." : "로그인"}
             </button>

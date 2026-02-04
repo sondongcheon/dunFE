@@ -6,6 +6,10 @@ import PCTest1Page from "./PC/test/Test1Page";
 import PCTest2Page from "./PC/test/Test2Page";
 import PCContentMainPage from "@/PC/content/contentMain";
 import PCContentDetailPage from "@/PC/content/contentDetail";
+import PCAdminPage from "@/PC/admin/AdminPage";
+import PCAdminNoticePage from "@/PC/admin/AdminNoticePage";
+import PCAdminTodayPage from "@/PC/admin/AdminTodayPage";
+import PCCommentsPage from "@/PC/comments/CommentsPage";
 
 // MOBILE 페이지
 import MobileTestPage from "./MOBILE/test/TestPage";
@@ -13,6 +17,10 @@ import MobileTest1Page from "./MOBILE/test/Test1Page";
 import MobileTest2Page from "./MOBILE/test/Test2Page";
 import MobileContentMainPage from "./MOBILE/content/contentMain";
 import MobileContentDetailPage from "./MOBILE/content/contentDetail";
+import MobileAdminPage from "./MOBILE/admin/AdminPage";
+import MobileAdminNoticePage from "./MOBILE/admin/AdminNoticePage";
+import MobileAdminTodayPage from "./MOBILE/admin/AdminTodayPage";
+import MobileCommentsPage from "./MOBILE/comments/CommentsPage";
 
 // PC 헤더 / 모바일 하단 Nav
 import PCMainNav from "./PC/common/MainNav";
@@ -37,6 +45,10 @@ const ROUTE_MAP = [
   { path: "/notice", PC: PCTest2Page, MOBILE: MobileTest2Page },
   { path: "/content", PC: PCContentMainPage, MOBILE: MobileContentMainPage },
   { path: "/content/:id", PC: PCContentDetailPage, MOBILE: MobileContentDetailPage },
+  { path: "/admin", PC: PCAdminPage, MOBILE: MobileAdminPage },
+  { path: "/admin/notice", PC: PCAdminNoticePage, MOBILE: MobileAdminNoticePage },
+  { path: "/admin/today", PC: PCAdminTodayPage, MOBILE: MobileAdminTodayPage },
+  { path: "/comments", PC: PCCommentsPage, MOBILE: MobileCommentsPage },
 ];
 
 function Router() {
@@ -45,14 +57,10 @@ function Router() {
   return (
     <BrowserRouter>
       {isMobile ? <MobileBottomNav /> : <PCMainNav />}
-      
+
       <Routes>
         {ROUTE_MAP.map(({ path, PC, MOBILE }) => (
-          <Route
-            key={path}
-            path={path}
-            element={isMobile ? <MOBILE /> : <PC />}
-          />
+          <Route key={path} path={path} element={isMobile ? <MOBILE /> : <PC />} />
         ))}
       </Routes>
     </BrowserRouter>

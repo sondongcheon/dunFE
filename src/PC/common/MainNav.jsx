@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { path: "/", label: "홈" },
   { path: "/content", label: "컨텐츠", hasSubmenu: true },
   { path: "/notice", label: "공지사항" },
+  { path: "/comments", label: "유저 코멘트" },
 ];
 
 function MainNav() {
@@ -25,7 +26,7 @@ function MainNav() {
   useEffect(() => {
     const savedId = localStorage.getItem("adventureId");
     const savedName = localStorage.getItem("adventureName");
-    
+
     if (savedId && savedName) {
       setIsLoggedIn(true);
       setAdventureName(savedName);
@@ -62,9 +63,7 @@ function MainNav() {
             <CharacterAddModal />
             {isLoggedIn ? (
               <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  {adventureName}
-                </span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{adventureName}</span>
                 <button
                   onClick={handleLogout}
                   className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
@@ -112,7 +111,7 @@ function MainNav() {
 
                   {/* 호버 시 하단 드롭다운 */}
                   {hoveredNav === item.path && (
-                    <div 
+                    <div
                       className="absolute top-full left-0 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2 z-50"
                       onMouseEnter={() => setHoveredNav(item.path)}
                       onMouseLeave={() => setHoveredNav(null)}
@@ -143,12 +142,17 @@ function MainNav() {
                               <div
                                 className="flex-1 min-h-0 rounded-lg overflow-hidden w-full relative"
                                 style={{
-                                  backgroundImage: CONTENT_BG_IMAGES[key] ? `url(${CONTENT_BG_IMAGES[key]})` : undefined,
+                                  backgroundImage: CONTENT_BG_IMAGES[key]
+                                    ? `url(${CONTENT_BG_IMAGES[key]})`
+                                    : undefined,
                                   backgroundSize: "cover",
                                   backgroundPosition: "center 15%",
                                 }}
                               >
-                                <span className="absolute inset-0 bg-black/50 rounded-lg" aria-hidden />
+                                <span
+                                  className="absolute inset-0 bg-black/50 rounded-lg"
+                                  aria-hidden
+                                />
                                 <span className="relative z-10 flex items-center px-4 py-2 text-base font-medium text-white">
                                   {value}
                                 </span>
@@ -161,7 +165,7 @@ function MainNav() {
                           <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
                             {item.label} 메뉴
                           </div>
-                          <div 
+                          <div
                             className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                             onClick={() => navigate(item.path)}
                           >

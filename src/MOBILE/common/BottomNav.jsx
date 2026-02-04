@@ -4,11 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "@/store/settingsSlice";
 import LoginModal from "@/PC/common/LoginModal";
 import CharacterAddModal from "@/PC/common/CharacterAddModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const NAV_ITEMS = [
   { path: "/", label: "홈", icon: "🏠" },
   { path: "/content", label: "컨텐츠", icon: "📋" },
-  { path: "/notice", label: "공지", icon: "📢" },
 ];
 
 function BottomNav() {
@@ -19,6 +25,7 @@ function BottomNav() {
   const [showMore, setShowMore] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showCharacterAddModal, setShowCharacterAddModal] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adventureName, setAdventureName] = useState("");
 
@@ -42,6 +49,7 @@ function BottomNav() {
     localStorage.removeItem("adventureName");
     setIsLoggedIn(false);
     setAdventureName("");
+    setShowLogoutConfirm(false);
   };
 
   return (
@@ -73,10 +81,19 @@ function BottomNav() {
             );
           })}
 
+          <button
+            type="button"
+            onClick={() => setShowCharacterAddModal(true)}
+            className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 text-gray-500 dark:text-gray-400 transition-colors active:scale-95"
+          >
+            <span className="text-xl leading-none">➕</span>
+            <span className="text-[10px] font-medium">캐릭터 추가</span>
+          </button>
+
           {isLoggedIn ? (
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={() => setShowLogoutConfirm(true)}
               className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 text-gray-500 dark:text-gray-400 transition-colors active:scale-95"
               title={adventureName}
             >
@@ -119,6 +136,33 @@ function BottomNav() {
         showTrigger={false}
       />
 
+      <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+        <DialogContent className="max-w-[280px] rounded-xl gap-4 p-5 dark:bg-gray-800 dark:border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-base font-semibold text-gray-900 dark:text-white">
+              로그아웃
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-gray-600 dark:text-gray-400">정말 로그아웃 하시겠습니까?</p>
+          <DialogFooter className="flex gap-2 justify-end sm:justify-end">
+            <button
+              type="button"
+              onClick={() => setShowLogoutConfirm(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-500"
+            >
+              로그아웃
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* 더보기 팝오버 */}
       {showMore && (
         <>
@@ -136,13 +180,24 @@ function BottomNav() {
               <button
                 type="button"
                 onClick={() => {
-                  setShowCharacterAddModal(true);
+                  navigate("/notice");
                   setShowMore(false);
                 }}
                 className="w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
               >
-                <span>캐릭터 추가</span>
-                <span aria-hidden>+</span>
+                <span>공지 사항</span>
+                <span aria-hidden>📢</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/comments");
+                  setShowMore(false);
+                }}
+                className="w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
+              >
+                <span>유저 코멘트</span>
+                <span aria-hidden>💬</span>
               </button>
               <button
                 type="button"

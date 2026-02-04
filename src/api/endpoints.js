@@ -44,6 +44,12 @@ export const CONTENT_ENDPOINTS = {
     DETAIL: "/content",
 };
 
+// Board(공지·코멘트) 관련 엔드포인트
+export const BOARD_ENDPOINTS = {
+    NOTICE: "/board/notice",
+    COMMENT: "/board/comment",
+};
+
 // Party 관련 엔드포인트
 export const PARTY_ENDPOINTS = {
     CREATE: "/content/party",

@@ -8,16 +8,14 @@ function TestPage() {
 
   // 메인 컨텐츠 바로가기 목록
   const mainContentKeys = ["venus_goddess_of_beauty", "nabel", "inae", "diregie"];
-  const contentList = mainContentKeys.map(key => [key, CONTENT_IDS[key]]);
+  const contentList = mainContentKeys.map((key) => [key, CONTENT_IDS[key]]);
 
   return (
     <div className="mainbody">
       <div className="max-w-5xl mx-auto">
         {/* 히어로 섹션 */}
         <section className="text-center py-12 mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            DunRoot
-          </h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">DunRoot</h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
             던전앤파이터 파티 & 그룹 관리 서비스
           </p>
@@ -82,7 +80,9 @@ function TestPage() {
                 <div
                   className="flex-1 min-h-0 rounded-lg overflow-hidden w-full relative"
                   style={{
-                    backgroundImage: CONTENT_BG_IMAGES[key] ? `url(${CONTENT_BG_IMAGES[key]})` : undefined,
+                    backgroundImage: CONTENT_BG_IMAGES[key]
+                      ? `url(${CONTENT_BG_IMAGES[key]})`
+                      : undefined,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                   }}

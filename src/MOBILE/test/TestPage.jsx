@@ -8,15 +8,13 @@ function TestPage() {
 
   // 메인 컨텐츠 바로가기 목록
   const mainContentKeys = ["venus_goddess_of_beauty", "nabel", "inae", "diregie"];
-  const contentList = mainContentKeys.map(key => [key, CONTENT_IDS[key]]);
+  const contentList = mainContentKeys.map((key) => [key, CONTENT_IDS[key]]);
 
   return (
     <div className="mainMobileBody pb-20">
       {/* 히어로 섹션 */}
       <section className="text-center py-8 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          DunRoot
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">DunRoot</h1>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           던전앤파이터 파티 & 그룹 관리 서비스
         </p>
@@ -87,7 +85,9 @@ function TestPage() {
               <div
                 className="flex-1 min-h-0 rounded-lg overflow-hidden w-full relative"
                 style={{
-                  backgroundImage: CONTENT_BG_IMAGES[key] ? `url(${CONTENT_BG_IMAGES[key]})` : undefined,
+                  backgroundImage: CONTENT_BG_IMAGES[key]
+                    ? `url(${CONTENT_BG_IMAGES[key]})`
+                    : undefined,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}
@@ -112,9 +112,7 @@ function TestPage() {
 
       {/* 푸터 */}
       <footer className="text-center py-6 border-t border-gray-200 dark:border-gray-700">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-          © 2026 DunRoot
-        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">© 2026 DunRoot</p>
         <a
           href="http://developers.neople.co.kr"
           target="_blank"

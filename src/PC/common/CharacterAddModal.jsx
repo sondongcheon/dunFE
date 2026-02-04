@@ -29,7 +29,11 @@ const SERVERS = [
  * @param {function} [onOpenChange] - 제어 모드일 때 열림 상태 변경 콜백
  * @param {boolean} [showTrigger=true] - false면 트리거 버튼 미렌더 (제어 모드 전용)
  */
-function CharacterAddModal({ open: controlledOpen, onOpenChange: controlledOnOpenChange, showTrigger = true }) {
+function CharacterAddModal({
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  showTrigger = true,
+}) {
   const [input, setInput] = useState("");
   const [selectedServerId, setSelectedServerId] = useState("");
   const [internalOpen, setInternalOpen] = useState(false);
@@ -42,7 +46,7 @@ function CharacterAddModal({ open: controlledOpen, onOpenChange: controlledOnOpe
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!input.trim() || !selectedServerId) {
       return;
     }
@@ -55,10 +59,10 @@ function CharacterAddModal({ open: controlledOpen, onOpenChange: controlledOnOpe
       // server: selectedServerId (예: "cain")
       // characterName: input (예: "구름테스트")
       await addCharacter(selectedServerId, input.trim());
-      
+
       // 성공 시 alert 표시
       alert("캐릭터가 성공적으로 추가되었습니다.");
-      
+
       // 성공 시 모달 닫기
       setOpen(false);
       setInput("");
@@ -67,7 +71,8 @@ function CharacterAddModal({ open: controlledOpen, onOpenChange: controlledOnOpe
     } catch (err) {
       // 에러 발생 시 모달을 닫지 않고 에러 메시지만 표시
       // 서버에서 보낸 메시지가 있으면 그것을 사용, 없으면 기본 메시지
-      const errorMessage = err.response?.data?.message || err.message || "캐릭터 추가에 실패했습니다.";
+      const errorMessage =
+        err.response?.data?.message || err.message || "캐릭터 추가에 실패했습니다.";
       setError(errorMessage);
       console.error("캐릭터 추가 실패:", err);
     } finally {
@@ -98,11 +103,9 @@ function CharacterAddModal({ open: controlledOpen, onOpenChange: controlledOnOpe
       <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-6">
         <DialogHeader>
           <DialogTitle>캐릭터 추가</DialogTitle>
-          <DialogDescription>
-            캐릭터 정보를 입력해주세요.
-          </DialogDescription>
+          <DialogDescription>캐릭터 정보를 입력해주세요.</DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -150,11 +153,7 @@ function CharacterAddModal({ open: controlledOpen, onOpenChange: controlledOnOpe
                 placeholder="캐릭터 이름을 입력하세요"
                 autoFocus
               />
-              {error && (
-                <p className="text-xs text-red-600 dark:text-red-400">
-                  {error}
-                </p>
-              )}
+              {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
             </div>
           </div>
 
@@ -163,7 +162,7 @@ function CharacterAddModal({ open: controlledOpen, onOpenChange: controlledOnOpe
               <button
                 type="button"
                 disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 mr-4 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 취소
               </button>

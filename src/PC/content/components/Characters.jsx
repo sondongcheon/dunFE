@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import EditableMemo from "./EditableMemo";
 import { toServerIdForUrl } from "@/utils/serverMapping";
+import { CONTENT_IDS } from "../constants";
 
 /**
  * 캐릭터가 소속된 파티·파티그룹 찾기
@@ -40,7 +41,12 @@ function getCharacterPartyGroups(character, parties) {
  * @param {Set<number>} addedCharacterIds - 그룹에 등록된 캐릭터 ID 집합 (제외해서 보기 시 필터)
  * @param {Function} onMemoUpdate - 메모 수정 후 콜백 (데이터 새로고침용)
  * @param {boolean} canEditMemo - 메모 편집 가능 여부 (로그인 시 true)
+ * @param {string} contentName - 컨텐츠 식별자 (부연설명 노출 조건용)
+ * @param {Function} onClearState - 닉네임 클릭 시 클리어 상태 갱신 (characterId) => Promise, 허용 content에서만 사용
  */
+const SHOW_CLEAR_HINT_CONTENTS = ["azure_main", "goddess_of_death_temple"];
+const ALLOWED_CLEAR_STATE_CONTENTS = ["azure_main", "goddess_of_death_temple"];
+
 function Characters({
   characters = [],
   groups = [],
@@ -48,10 +54,13 @@ function Characters({
   loading = false,
   addedCharacterIds,
   onMemoUpdate,
+  onClearState,
   canEditMemo = false,
+  contentName,
 }) {
   const [sectionExpanded, setSectionExpanded] = useState(true);
   const [filterMode, setFilterMode] = useState("include"); // "include" | "exclude"
+  const [clearingCharacterId, setClearingCharacterId] = useState(null);
 
   const displayCharacters = useMemo(() => {
     if (!addedCharacterIds || addedCharacterIds.size === 0) return characters;
@@ -70,7 +79,7 @@ function Characters({
           onKeyDown={(e) => e.key === "Enter" && setSectionExpanded((v) => !v)}
           aria-expanded={sectionExpanded}
         >
-          <h2 className="text-2xl font-bold">Characters</h2>
+          <h2 className="text-2xl font-bold">캐릭터 목록</h2>
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {sectionExpanded ? "▼" : "▲"}
           </span>
@@ -93,7 +102,7 @@ function Characters({
           onKeyDown={(e) => e.key === "Enter" && setSectionExpanded((v) => !v)}
           aria-expanded={sectionExpanded}
         >
-          <h2 className="text-2xl font-bold">Characters</h2>
+          <h2 className="text-2xl font-bold">캐릭터 목록</h2>
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {sectionExpanded ? "▼" : "▲"}
           </span>
@@ -117,7 +126,14 @@ function Characters({
         onKeyDown={(e) => e.key === "Enter" && setSectionExpanded((v) => !v)}
         aria-expanded={sectionExpanded}
       >
-        <h2 className="text-2xl font-bold">Characters</h2>
+        <div className="flex flex-col gap-0.5">
+          <h2 className="text-2xl font-bold">캐릭터 목록</h2>
+          {contentName && SHOW_CLEAR_HINT_CONTENTS.includes(contentName) && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-normal italic">
+              닉네임을 클릭하면 클리어 상태로 변경할 수 있습니다. (상급던전 한정)
+            </p>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           {sectionExpanded && hasAdded && (
             <div className="flex flex-wrap gap-2 justify-end" onClick={(e) => e.stopPropagation()}>
@@ -204,9 +220,37 @@ function Characters({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="w-full text-center mb-2">
-                    <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
-                      {character.name}
-                    </span>
+                    {contentName &&
+                    ALLOWED_CLEAR_STATE_CONTENTS.includes(contentName) &&
+                    typeof onClearState === "function" ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (character.clearState) return;
+                          if (clearingCharacterId !== null) return;
+                          const contentLabel = CONTENT_IDS[contentName] ?? contentName;
+                          const confirmed = window.confirm(
+                            `"${character.name}" 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`
+                          );
+                          if (!confirmed) return;
+                          setClearingCharacterId(character.id);
+                          onClearState([character.id]).finally(() => setClearingCharacterId(null));
+                        }}
+                        disabled={clearingCharacterId === character.id}
+                        className={
+                          character.clearState
+                            ? "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-default"
+                            : "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-pointer hover:underline focus:underline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                        }
+                        title={character.clearState ? undefined : "클릭 시 클리어 처리"}
+                      >
+                        {character.name}
+                      </button>
+                    ) : (
+                      <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
+                        {character.name}
+                      </span>
+                    )}
                   </div>
                   {/* 1줄: 그룹명 (private 그룹 소속 시) */}
                   {character.groupNum !== null && character.groupNum !== undefined && (

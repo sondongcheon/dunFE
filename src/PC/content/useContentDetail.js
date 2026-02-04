@@ -5,6 +5,7 @@ import {
   addCharacterToGroup,
   removeCharacterFromGroup,
   updateCharacterMemo,
+  updateClearState,
   updateGroupName,
   removeGroup,
   createGroup,
@@ -218,6 +219,18 @@ function useContentDetail(id) {
     }
   };
 
+  const handleUpdateClearState = async (characterIds) => {
+    const ids = Array.isArray(characterIds) ? characterIds : [characterIds];
+    if (ids.length === 0) return;
+    try {
+      await updateClearState(ids, id);
+      await refresh();
+    } catch (e) {
+      console.error("클리어 상태 갱신 실패:", e);
+      throw e;
+    }
+  };
+
   const handleUpdatePartyName = async (partyId, name) => {
     try {
       await updatePartyName(id, partyId, name);
@@ -281,6 +294,7 @@ function useContentDetail(id) {
       handleRemovePartyGroup,
       handleRemoveParty,
       handleMemoUpdate,
+      handleUpdateClearState,
       handleUpdatePartyName,
       handleUpdatePartyGroupName,
       handleJoinParty,

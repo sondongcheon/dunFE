@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import EditableMemo from "./EditableMemo";
 import { toServerIdForUrl } from "@/utils/serverMapping";
+import { CONTENT_IDS } from "../constants";
+
+const ALLOWED_CLEAR_STATE_CONTENTS = ["azure_main", "goddess_of_death_temple"];
 
 /**
  * Party 컴포넌트
@@ -41,10 +44,12 @@ function Party({
   onRemoveCharacterFromPublicGroup,
   onJoinParty,
   onMemoUpdate,
+  onClearState,
   onUpdatePartyName,
   onUpdatePartyGroupName,
   canEditMemo = false,
 }) {
+  const [clearingCharacterId, setClearingCharacterId] = useState(null);
   const [sectionExpanded, setSectionExpanded] = useState(true);
   const [newPartyName, setNewPartyName] = useState("");
   const [newPartyPassword, setNewPartyPassword] = useState("");
@@ -253,10 +258,7 @@ function Party({
         aria-expanded={sectionExpanded}
       >
         <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-bold">Party</h2>
-          <span className="text-xs px-2 py-1 rounded font-medium bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
-            Public
-          </span>
+          <h2 className="text-2xl font-bold">파티 - 공유 그룹 만들기 & 참가</h2>
         </div>
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {sectionExpanded ? "▼" : "▲"}
@@ -849,9 +851,57 @@ function Party({
                                                   </div>
                                                   <div className="flex-1 min-w-0">
                                                     <div className="w-full text-center mb-2">
-                                                      <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
-                                                        {member.nickname ?? ""}
-                                                      </span>
+                                                      {contentName &&
+                                                      ALLOWED_CLEAR_STATE_CONTENTS.includes(
+                                                        contentName
+                                                      ) &&
+                                                      typeof onClearState === "function" &&
+                                                      isMyCharacter ? (
+                                                        <button
+                                                          type="button"
+                                                          onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (isClear) return;
+                                                            if (clearingCharacterId !== null)
+                                                              return;
+                                                            const characterId =
+                                                              member.id ?? member.characterId;
+                                                            const contentLabel =
+                                                              CONTENT_IDS[contentName] ??
+                                                              contentName;
+                                                            const confirmed = window.confirm(
+                                                              `"${
+                                                                member.nickname ?? ""
+                                                              }" 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`
+                                                            );
+                                                            if (!confirmed) return;
+                                                            setClearingCharacterId(characterId);
+                                                            onClearState([characterId]).finally(
+                                                              () => setClearingCharacterId(null)
+                                                            );
+                                                          }}
+                                                          disabled={
+                                                            clearingCharacterId ===
+                                                            (member.id ?? member.characterId)
+                                                          }
+                                                          className={
+                                                            isClear
+                                                              ? "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-default"
+                                                              : "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-pointer hover:underline focus:underline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                                          }
+                                                          title={
+                                                            isClear
+                                                              ? undefined
+                                                              : "클릭 시 클리어 처리"
+                                                          }
+                                                        >
+                                                          {member.nickname ?? ""}
+                                                        </button>
+                                                      ) : (
+                                                        <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
+                                                          {member.nickname ?? ""}
+                                                        </span>
+                                                      )}
                                                     </div>
                                                     {(member.adventureName || member.server) && (
                                                       <div className="text-xs text-center mb-2 flex flex-wrap justify-center items-center gap-x-1.5">

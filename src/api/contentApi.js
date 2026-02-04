@@ -206,3 +206,24 @@ export async function updateCharacterMemo(characterId, memo) {
         throw error;
     }
 }
+
+/**
+ * 캐릭터 클리어 상태 갱신 (UpdateClearStateReq: characterIds, content)
+ * PATCH /api/characters/clear-state
+ * 허용 content: azure_main, goddess_of_death_temple, venus_goddess_of_beauty, nabel, inae, diregie
+ * 로그인 필요, 본인 캐릭터만 가능. 해당 content 컬럼만 true로 갱신.
+ * @param {number[]} characterIds - 캐릭터 ID 배열
+ * @param {string} content - 콘텐츠 식별자 (CONTENT_IDS 키)
+ * @returns {Promise<void>}
+ */
+export async function updateClearState(characterIds, content) {
+    try {
+        await apiClient.patch(CHARACTER_ENDPOINTS.CLEAR_STATE, {
+            characterIds: Array.isArray(characterIds) ? characterIds : [characterIds],
+            content,
+        });
+    } catch (error) {
+        console.error("클리어 상태 갱신 실패:", error);
+        throw error;
+    }
+}

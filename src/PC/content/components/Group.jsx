@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import EditableMemo from "./EditableMemo";
 import { toServerIdForUrl } from "@/utils/serverMapping";
+import { CONTENT_IDS } from "../constants";
+
+const ALLOWED_CLEAR_STATE_CONTENTS = ["azure_main", "goddess_of_death_temple"];
 
 /**
  * Group 컴포넌트
@@ -19,6 +22,7 @@ function Group({
   onAddCharacter,
   onRemoveCharacter,
   onMemoUpdate,
+  onClearState,
   onUpdateGroupName,
   onRemoveGroup,
   canEditMemo = false,
@@ -29,6 +33,8 @@ function Group({
   const [addTargetGroupId, setAddTargetGroupId] = useState(null);
   const [editingGroupId, setEditingGroupId] = useState(null);
   const [editingGroupName, setEditingGroupName] = useState("");
+  const [clearingCharacterId, setClearingCharacterId] = useState(null);
+  const [clearingGroupId, setClearingGroupId] = useState(null);
 
   // 기본 상태: 모든 그룹이 펼쳐진 상태
   React.useEffect(() => {
@@ -87,10 +93,7 @@ function Group({
         aria-expanded={sectionExpanded}
       >
         <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-bold">Group</h2>
-          <span className="text-xs px-2 py-1 rounded font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-            Private
-          </span>
+          <h2 className="text-2xl font-bold">내 캐릭터 그룹 목록</h2>
         </div>
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {sectionExpanded ? "▼" : "▲"}
@@ -259,8 +262,35 @@ function Group({
                       <div className="border-t border-gray-200 dark:border-gray-700 px-3 py-3 space-y-3">
                         {/* 등록된 캐릭터 */}
                         <div>
-                          <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
-                            등록된 캐릭터
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                              등록된 캐릭터
+                            </span>
+                            {contentName &&
+                              ALLOWED_CLEAR_STATE_CONTENTS.includes(contentName) &&
+                              typeof onClearState === "function" &&
+                              members.length > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (clearingGroupId !== null) return;
+                                    const contentLabel = CONTENT_IDS[contentName] ?? contentName;
+                                    const confirmed = window.confirm(
+                                      `이 그룹의 ${members.length}명 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`
+                                    );
+                                    if (!confirmed) return;
+                                    setClearingGroupId(group.id);
+                                    onClearState(members.map((c) => c.id)).finally(() =>
+                                      setClearingGroupId(null)
+                                    );
+                                  }}
+                                  disabled={clearingGroupId === group.id}
+                                  className="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                                >
+                                  모두 클리어 처리
+                                </button>
+                              )}
                           </div>
                           {members.length === 0 ? (
                             <div className="text-xs text-gray-500 dark:text-gray-400 py-2">
@@ -325,9 +355,46 @@ function Group({
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <div className="w-full text-center mb-2">
-                                      <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
-                                        {char.name}
-                                      </span>
+                                      {contentName &&
+                                      ALLOWED_CLEAR_STATE_CONTENTS.includes(contentName) &&
+                                      typeof onClearState === "function" ? (
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (char.clearState) return;
+                                            if (clearingCharacterId !== null) return;
+                                            const contentLabel =
+                                              CONTENT_IDS[contentName] ?? contentName;
+                                            const confirmed = window.confirm(
+                                              `"${char.name}" 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`
+                                            );
+                                            if (!confirmed) return;
+                                            setClearingCharacterId(char.id);
+                                            onClearState([char.id]).finally(() =>
+                                              setClearingCharacterId(null)
+                                            );
+                                          }}
+                                          disabled={
+                                            clearingCharacterId === char.id ||
+                                            clearingGroupId === group.id
+                                          }
+                                          className={
+                                            char.clearState
+                                              ? "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-default"
+                                              : "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-pointer hover:underline focus:underline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                          }
+                                          title={
+                                            char.clearState ? undefined : "클릭 시 클리어 처리"
+                                          }
+                                        >
+                                          {char.name}
+                                        </button>
+                                      ) : (
+                                        <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
+                                          {char.name}
+                                        </span>
+                                      )}
                                     </div>
                                     <div className="flex flex-wrap items-center justify-center gap-1.5 mb-2">
                                       <span className="text-xs text-gray-500 dark:text-gray-400">

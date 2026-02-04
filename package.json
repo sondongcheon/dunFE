@@ -31,10 +31,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "cross-env PORT=3010 react-app-rewired start",
+    "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "env:check": "node -e \"const path=require('path');const fs=require('fs');const p=path.resolve(process.cwd(),'.env');console.log('cwd:',process.cwd());console.log('.env exists:',fs.existsSync(p));require('dotenv').config({path:p});console.log('REACT_APP_API_BASE_URL:',process.env.REACT_APP_API_BASE_URL);\""
   },
   "eslintConfig": {
     "extends": [
@@ -55,8 +56,10 @@
     ]
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
+    "dotenv": "^10.0.0",
+    "dotenv-expand": "^5.1.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15"
   }

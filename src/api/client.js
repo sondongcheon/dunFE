@@ -25,8 +25,8 @@
  */
 import axios from "axios";
 
-// .env에서 API 베이스 URL 가져오기 (없으면 기본값 사용)
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://dunroot.com/api";
+// .env는 개발 서버 시작 시에만 주입됨. 수정 후에는 npm start 재실행 필요.
+const API_BASE_URL = `${process.env.REACT_APP_API_BASE_URL}`; 
 
 // axios 인스턴스 생성
 const apiClient = axios.create({

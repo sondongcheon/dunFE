@@ -10,6 +10,7 @@ export const CHARACTER_ENDPOINTS = {
     LIST: "/characters",
     ADD: "/characters",
     MEMO: "/characters/memo",
+    CLEAR_STATE: "/characters/clear-state",
 };
 
 // Group 관련 엔드포인트

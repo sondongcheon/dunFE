@@ -171,18 +171,18 @@ export async function removeCharacterFromGroup(groupId, characterId, contentName
  * 캐릭터 추가 (API 호출, 복수 명 지원)
  * 닉네임을 배열로 전달하여 한 번에 여러 캐릭터 추가 가능
  * @param {string} server - 서버 ID (예: "cain")
- * @param {string[]} nicknames - 캐릭터 닉네임 배열
+ * @param {string[]} characterNames - 캐릭터 닉네임 배열
  * @returns {Promise<{ failed?: Array<{ characterName: string, reason: string }> }>} 응답 body (failed: 추가 실패 목록)
  */
-export async function addCharacter(server, nicknames) {
-    const list = Array.isArray(nicknames) ? nicknames : [nicknames].filter(Boolean);
+export async function addCharacter(server, characterNames) {
+    const list = Array.isArray(characterNames) ? characterNames : [characterNames].filter(Boolean);
     const trimmed = list.map((n) => String(n).trim()).filter(Boolean);
     if (trimmed.length === 0) {
         throw new Error("추가할 캐릭터 닉네임을 입력해 주세요.");
     }
     const response = await apiClient.post(CHARACTER_ENDPOINTS.ADD, {
         server,
-        nicknames: trimmed,
+        characterNames: trimmed,
     });
     return response.data ?? {};
 }

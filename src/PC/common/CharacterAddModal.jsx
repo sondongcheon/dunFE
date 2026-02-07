@@ -34,40 +34,67 @@ function CharacterAddModal({
   onOpenChange: controlledOnOpenChange,
   showTrigger = true,
 }) {
-  const [input, setInput] = useState("");
+  const [inputs, setInputs] = useState([""]);
   const [selectedServerId, setSelectedServerId] = useState("");
   const [internalOpen, setInternalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [addResult, setAddResult] = useState(null);
 
   const isControlled = controlledOpen !== undefined && controlledOnOpenChange != null;
   const open = isControlled ? controlledOpen : internalOpen;
   const setOpen = isControlled ? controlledOnOpenChange : setInternalOpen;
 
+  const updateInput = (index, value) => {
+    setInputs((prev) => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+    setError(null);
+  };
+
+  const addRow = () => {
+    setInputs((prev) => [...prev, ""]);
+  };
+
+  const removeRow = (index) => {
+    if (inputs.length <= 1) return;
+    setInputs((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const nicknamesFromInputs = inputs.map((s) => s.trim()).filter(Boolean);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!input.trim() || !selectedServerId) {
+    if (nicknamesFromInputs.length === 0 || !selectedServerId) {
+      setError(!selectedServerId ? "서버를 선택해 주세요." : "캐릭터 닉네임을 입력해 주세요.");
       return;
     }
 
     setLoading(true);
     setError(null);
+    setAddResult(null);
 
     try {
-      // API 호출: 캐릭터 추가
-      // server: selectedServerId (예: "cain")
-      // characterName: input (예: "구름테스트")
-      await addCharacter(selectedServerId, input.trim());
+      const result = await addCharacter(selectedServerId, nicknamesFromInputs);
+      const failed = result.failed ?? [];
+      const successCount = nicknamesFromInputs.length - failed.length;
 
-      // 성공 시 alert 표시
-      alert("캐릭터가 성공적으로 추가되었습니다.");
+      setAddResult({ successCount, failed });
 
-      // 성공 시 모달 닫기
-      setOpen(false);
-      setInput("");
-      setSelectedServerId("");
-      setError(null);
+      if (failed.length === 0) {
+        setOpen(false);
+        setInputs([""]);
+        setSelectedServerId("");
+        setAddResult(null);
+        alert(
+          successCount > 1
+            ? `캐릭터 ${successCount}명이 성공적으로 추가되었습니다.`
+            : "캐릭터가 성공적으로 추가되었습니다.",
+        );
+      }
     } catch (err) {
       // 에러 발생 시 모달을 닫지 않고 에러 메시지만 표시
       // 서버에서 보낸 메시지가 있으면 그것을 사용, 없으면 기본 메시지
@@ -84,12 +111,15 @@ function CharacterAddModal({
     if (!loading) {
       setOpen(newOpen);
       if (!newOpen) {
-        setInput("");
+        setInputs([""]);
         setSelectedServerId("");
         setError(null);
+        setAddResult(null);
       }
     }
   };
+
+  const canSubmit = nicknamesFromInputs.length > 0 && selectedServerId && !loading;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -103,7 +133,10 @@ function CharacterAddModal({
       <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-6">
         <DialogHeader>
           <DialogTitle>캐릭터 추가</DialogTitle>
-          <DialogDescription>캐릭터 정보를 입력해주세요.</DialogDescription>
+          <DialogDescription>
+            서버를 선택하고, 추가할 캐릭터 닉네임을 입력하세요. <br />
+            입력 칸을 추가해 여러 명을 넣을 수 있습니다.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
@@ -134,25 +167,67 @@ function CharacterAddModal({
               </select>
             </div>
             <div className="space-y-2">
-              <label
-                htmlFor="character-input"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                입력값
-              </label>
-              <input
-                id="character-input"
-                type="text"
-                value={input}
-                onChange={(e) => {
-                  setInput(e.target.value);
-                  setError(null);
-                }}
-                disabled={loading}
-                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="캐릭터 이름을 입력하세요"
-                autoFocus
-              />
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  닉네임
+                </label>
+                <button
+                  type="button"
+                  onClick={addRow}
+                  disabled={loading}
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50"
+                >
+                  + 입력 칸 추가
+                </button>
+              </div>
+              <div className="space-y-2 max-h-[200px] overflow-y-auto p-1 -m-1">
+                {inputs.map((value, index) => (
+                  <div key={index} className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      value={value}
+                      onChange={(e) => updateInput(index, e.target.value)}
+                      disabled={loading}
+                      placeholder="캐릭터 닉네임"
+                      className="flex-1 min-w-0 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                      autoFocus={index === 0 && inputs.length === 1}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeRow(index)}
+                      disabled={loading || inputs.length <= 1}
+                      className="shrink-0 px-3 py-2 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-400 hover:bg-red-50 hover:border-red-300 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:border-red-700 dark:hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-300 dark:disabled:hover:border-gray-600"
+                      aria-label="이 입력 칸 삭제"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                ))}
+              </div>
+              {nicknamesFromInputs.length > 0 && !addResult && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {nicknamesFromInputs.length}명 추가 예정
+                </p>
+              )}
+              {addResult && addResult.failed.length > 0 && (
+                <div className="rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-3 space-y-1">
+                  {addResult.successCount > 0 && (
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {addResult.successCount}명 추가됨.
+                    </p>
+                  )}
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                    {addResult.failed.length}명 실패:
+                  </p>
+                  <ul className="text-xs text-amber-700 dark:text-amber-300 space-y-0.5">
+                    {addResult.failed.map((item, i) => (
+                      <li key={i}>
+                        {item.characterName} — {item.reason}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
             </div>
           </div>
@@ -169,7 +244,7 @@ function CharacterAddModal({
             </DialogClose>
             <button
               type="submit"
-              disabled={loading || !input.trim() || !selectedServerId}
+              disabled={!canSubmit}
               className="px-4 py-2 text-sm font-medium text-white bg-gray-800 dark:bg-gray-600 rounded-md hover:bg-gray-700 dark:hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "추가 중..." : "추가하기"}

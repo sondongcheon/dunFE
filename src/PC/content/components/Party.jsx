@@ -216,6 +216,18 @@ function Party({
     }
   };
 
+  /** 멤버 목록을 adventureId(모험단) 기준으로 묶어서 반환. [{ adventureId, adventureName, members }] */
+  const groupMembersByAdventure = (membersList) => {
+    const map = new Map();
+    (membersList || []).forEach((m) => {
+      const key = String(m.adventureId ?? m.adventureName ?? "unknown");
+      const name = m.adventureName ?? "알 수 없음";
+      if (!map.has(key)) map.set(key, { adventureId: key, adventureName: name, members: [] });
+      map.get(key).members.push(m);
+    });
+    return Array.from(map.values());
+  };
+
   // 파티 내 그룹에 이미 등록된 캐릭터 ID 집합 (characterId 기준, 한 캐릭터는 파티 내 한 그룹에만 등록 가능)
   const characterIdsInPartyGroups = React.useMemo(() => {
     const set = new Set();
@@ -735,7 +747,7 @@ function Party({
 
                                   {isGroupExpanded && (
                                     <div className="border-t border-gray-200 dark:border-gray-700 px-3 py-3 space-y-3">
-                                      {/* 등록된 멤버 */}
+                                      {/* 등록된 멤버 (모험단별로 묶어서 표시) */}
                                       <div>
                                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                                           등록된 캐릭터
@@ -745,8 +757,14 @@ function Party({
                                             없음
                                           </div>
                                         ) : (
-                                          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                                            {members.map((member) => {
+                                          <div className="space-y-4">
+                                            {groupMembersByAdventure(members).map(({ adventureId, adventureName, members: advMembers }) => (
+                                              <div key={adventureId}>
+                                                <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-2">
+                                                  {adventureName}
+                                                </div>
+                                                <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                                                  {advMembers.map((member) => {
                                               // member.id: 내 데이터의 내부 ID, member.characterId: 네오플 ID
                                               const myInternalId = member.id ?? member.characterId;
                                               const neopleCharacterId =
@@ -937,6 +955,9 @@ function Party({
                                                 </div>
                                               );
                                             })}
+                                                </div>
+                                              </div>
+                                            ))}
                                           </div>
                                         )}
                                       </div>
@@ -953,27 +974,38 @@ function Party({
                                                 추가 가능한 캐릭터가 없습니다.
                                               </div>
                                             ) : (
-                                              <div className="flex flex-wrap gap-1">
-                                                {addableCharacters.map((char) => (
-                                                  <button
-                                                    key={char.characterId ?? char.id}
-                                                    type="button"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      handleAddCharacter(group.id, char.id);
-                                                    }}
-                                                    className="px-2 py-1 text-xs bg-purple-100 dark:bg-purple-800 rounded hover:bg-purple-200 dark:hover:bg-purple-700 text-purple-700 dark:text-purple-300"
-                                                    title={
-                                                      char.adventureName
-                                                        ? `${char.name} (${char.adventureName})`
-                                                        : char.name
-                                                    }
-                                                  >
-                                                    {char.adventureName
-                                                      ? `${char.name} (${char.adventureName})`
-                                                      : char.name}
-                                                  </button>
-                                                ))}
+                                              <div className="space-y-2">
+                                                {(() => {
+                                                  const byAdv = addableCharacters.reduce((acc, char) => {
+                                                    const key = String(char.adventureId ?? char.adventureName ?? "");
+                                                    if (!acc[key]) acc[key] = { name: char.adventureName ?? "알 수 없음", chars: [] };
+                                                    acc[key].chars.push(char);
+                                                    return acc;
+                                                  }, {});
+                                                  return Object.entries(byAdv).map(([advKey, { name, chars }]) => (
+                                                    <div key={advKey}>
+                                                      <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">
+                                                        {name}
+                                                      </div>
+                                                      <div className="flex flex-wrap gap-1">
+                                                        {chars.map((char) => (
+                                                          <button
+                                                            key={char.characterId ?? char.id}
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                              e.stopPropagation();
+                                                              handleAddCharacter(group.id, char.id);
+                                                            }}
+                                                            className="px-2 py-1 text-xs bg-purple-100 dark:bg-purple-800 rounded hover:bg-purple-200 dark:hover:bg-purple-700 text-purple-700 dark:text-purple-300"
+                                                            title={char.name}
+                                                          >
+                                                            {char.name}
+                                                          </button>
+                                                        ))}
+                                                      </div>
+                                                    </div>
+                                                  ));
+                                                })()}
                                                 <button
                                                   type="button"
                                                   onClick={(e) => {

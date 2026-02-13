@@ -31,6 +31,7 @@ export const MEMBER_ENDPOINTS = {
 export const AUTH_ENDPOINTS = {
     LOGIN: "/adventure/login",
     LOGOUT: "/adventure/logout",
+    REISSUE: "/adventure/reissue",
 };
 
 // User 관련 엔드포인트 (예시)

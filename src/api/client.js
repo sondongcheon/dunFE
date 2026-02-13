@@ -24,6 +24,7 @@
  * - REACT_APP_API_BASE_URL: API 서버의 베이스 URL (.env 파일에 설정)
  */
 import axios from "axios";
+import { getSafeErrorMessage } from "@/utils/errorMessage";
 
 // .env는 개발 서버 시작 시에만 주입됨. 수정 후에는 npm start 재실행 필요.
 const API_BASE_URL = `${process.env.REACT_APP_API_BASE_URL}`; 
@@ -55,22 +56,20 @@ apiClient.interceptors.request.use(
 );
 
 // 응답 인터셉터
-// 모든 응답에 대해 공통 에러 처리를 수행합니다.
+// 오류 발생 시 사용자에게 알림창으로 안내하고, 메시지는 error.response.data.message 기반(안전 처리)으로 표시합니다.
 apiClient.interceptors.response.use(
     (response) => {
-        // 성공 응답은 그대로 반환
         return response;
     },
     (error) => {
-        // 공통 에러 처리
+        const message = getSafeErrorMessage(error, "오류가 발생했습니다.");
+        window.alert(message);
+
         if (error.response) {
-            // 서버가 응답했지만 에러 상태 코드
             console.error("API 에러:", error.response.status, error.response.data);
         } else if (error.request) {
-            // 요청은 보냈지만 응답을 받지 못함
             console.error("네트워크 에러:", error.request);
         } else {
-            // 요청 설정 중 에러 발생
             console.error("에러:", error.message);
         }
         return Promise.reject(error);

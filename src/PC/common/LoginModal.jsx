@@ -107,7 +107,7 @@ function LoginModal({ onLoginSuccess, open: controlledOpen, onOpenChange }) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
+        <form id="login-form" onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label
@@ -119,6 +119,7 @@ function LoginModal({ onLoginSuccess, open: controlledOpen, onOpenChange }) {
               <input
                 id="adventure-name"
                 type="text"
+                form="login-form"
                 value={adventureName}
                 onChange={(e) => {
                   setAdventureName(e.target.value);
@@ -140,6 +141,7 @@ function LoginModal({ onLoginSuccess, open: controlledOpen, onOpenChange }) {
               <input
                 id="password"
                 type="password"
+                form="login-form"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);

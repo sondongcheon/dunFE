@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getCommentList, createComment, updateComment } from "@/api/boardApi";
 import LoginModal from "@/PC/common/LoginModal";
+import { getSafeErrorMessage } from "@/utils/errorMessage";
 
 function CommentsPage() {
   const [comments, setComments] = useState([]);
@@ -51,8 +52,7 @@ function CommentsPage() {
       setTotalElements(res.totalElements ?? 0);
       setPage(res.page ?? pageNum);
     } catch (err) {
-      const msg = err.response?.data?.message || err.message || "코멘트를 불러오지 못했습니다.";
-      setError(msg);
+      setError(getSafeErrorMessage(err, "코멘트를 불러오지 못했습니다."));
       setComments([]);
     } finally {
       setLoading(false);
@@ -102,7 +102,7 @@ function CommentsPage() {
       setEditContent("");
       fetchComments(page);
     } catch (err) {
-      setEditError(err.response?.data?.message || err.message || "수정에 실패했습니다.");
+      setEditError(getSafeErrorMessage(err, "수정에 실패했습니다."));
     } finally {
       setEditLoading(false);
     }
@@ -130,7 +130,7 @@ function CommentsPage() {
       setHideNickname(false);
       fetchComments(page);
     } catch (err) {
-      setSubmitError(err.response?.data?.message || err.message || "등록에 실패했습니다.");
+      setSubmitError(getSafeErrorMessage(err, "등록에 실패했습니다."));
     } finally {
       setSubmitLoading(false);
     }

@@ -10,6 +10,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { addCharacter } from "@/api/contentApi";
+import { getSafeErrorMessage } from "@/utils/errorMessage";
 
 // 서버 목록 데이터
 const SERVERS = [
@@ -96,11 +97,7 @@ function CharacterAddModal({
         );
       }
     } catch (err) {
-      // 에러 발생 시 모달을 닫지 않고 에러 메시지만 표시
-      // 서버에서 보낸 메시지가 있으면 그것을 사용, 없으면 기본 메시지
-      const errorMessage =
-        err.response?.data?.message || err.message || "캐릭터 추가에 실패했습니다.";
-      setError(errorMessage);
+      setError(getSafeErrorMessage(err, "캐릭터 추가에 실패했습니다."));
       console.error("캐릭터 추가 실패:", err);
     } finally {
       setLoading(false);

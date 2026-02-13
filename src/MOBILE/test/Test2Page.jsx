@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getNoticeList } from "@/api/boardApi";
+import { getSafeErrorMessage } from "@/utils/errorMessage";
 
 function Test2Page() {
   const [expandedId, setExpandedId] = useState(null);
@@ -28,9 +29,7 @@ function Test2Page() {
       setTotalElements(res.totalElements ?? 0);
       setPage(res.page ?? pageNum);
     } catch (err) {
-      const message =
-        err.response?.data?.message || err.message || "공지사항을 불러오지 못했습니다.";
-      setError(message);
+      setError(getSafeErrorMessage(err, "공지사항을 불러오지 못했습니다."));
       setNotices([]);
     } finally {
       setLoading(false);

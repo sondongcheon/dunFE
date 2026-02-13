@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import neopleLogo from "@/Assets/기술표기_가로형_color.png";
 import { createNotice } from "@/api/boardApi";
+import { getSafeErrorMessage } from "@/utils/errorMessage";
 
 function AdminNoticePage() {
   const navigate = useNavigate();
@@ -41,11 +42,9 @@ function AdminNoticePage() {
       setNoticeForm({ title: "", content: "", important: false });
       setSuccess(true);
     } catch (err) {
-      const message =
-        err.response?.data?.message ||
-        err.message ||
-        "공지 등록에 실패했습니다. 다시 시도해 주세요.";
-      setError(message);
+      setError(
+        getSafeErrorMessage(err, "공지 등록에 실패했습니다. 다시 시도해 주세요."),
+      );
     } finally {
       setLoading(false);
     }

@@ -10,6 +10,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { login } from "@/api/authApi";
+import { getSafeErrorMessage } from "@/utils/errorMessage";
 
 /**
  * 로그인 모달 컴포넌트
@@ -65,8 +66,7 @@ function LoginModal({ onLoginSuccess, open: controlledOpen, onOpenChange }) {
       // 로그인 성공 시 페이지 리로드 (상태/캐시 동기화)
       window.location.reload();
     } catch (err) {
-      // 에러 처리
-      setError(err.message || "로그인에 실패했습니다.");
+      setError(getSafeErrorMessage(err, "로그인에 실패했습니다."));
       console.error("로그인 실패:", err);
     } finally {
       setLoading(false);

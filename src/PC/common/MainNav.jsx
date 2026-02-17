@@ -23,40 +23,41 @@ function MainNav() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adventureName, setAdventureName] = useState("");
 
-  // 페이지 로드 시 localStorage에서 로그인 정보 확인 및 실제 인증 상태 검증
+  // 페이지 로드 시: localStorage 또는 쿠키(토큰) 기준으로 로그인 상태 확인
   useEffect(() => {
     const checkAuth = async () => {
       const savedId = localStorage.getItem("adventureId");
       const savedName = localStorage.getItem("adventureName");
 
-      // localStorage에 정보가 없으면 로그아웃 상태
-      if (!savedId || !savedName) {
-        setIsLoggedIn(false);
-        setAdventureName("");
-        return;
+      // 1) localStorage에 있으면 일단 로그인 상태로 표시(낙관적)
+      if (savedId && savedName) {
+        setIsLoggedIn(true);
+        setAdventureName(savedName);
       }
 
-      // localStorage에 정보가 있으면 실제 인증 상태 확인
+      // 2) 쿠키(토큰) 유효 여부 확인: /me 호출
       try {
         const userInfo = await verifyAuth();
         if (userInfo && userInfo.id && userInfo.adventureName) {
-          // 인증 성공: localStorage와 서버 정보 동기화
-          localStorage.setItem("adventureId", userInfo.id);
+          // 인증 성공: localStorage 동기화 후 로그인 상태 유지
+          localStorage.setItem("adventureId", String(userInfo.id));
           localStorage.setItem("adventureName", userInfo.adventureName);
           setIsLoggedIn(true);
           setAdventureName(userInfo.adventureName);
         } else {
-          // 인증 실패: localStorage 정리
-          localStorage.removeItem("adventureId");
-          localStorage.removeItem("adventureName");
+          // /me가 401 등으로 실패: localStorage는 지우지 않고 로그인 상태 유지
+          // (쿠키가 유효한데 /me만 실패한 경우가 있을 수 있음)
+          if (!savedId || !savedName) {
+            setIsLoggedIn(false);
+            setAdventureName("");
+          }
+        }
+      } catch (error) {
+        // 네트워크 오류 등: localStorage가 있으면 로그인 상태 유지
+        if (!savedId || !savedName) {
           setIsLoggedIn(false);
           setAdventureName("");
         }
-      } catch (error) {
-        // 네트워크 오류 등: localStorage 정보는 유지하되, 다음 API 호출 시 재검증
-        // 일단 localStorage 정보로 UI 표시 (토큰이 유효할 수도 있음)
-        setIsLoggedIn(true);
-        setAdventureName(savedName);
       }
     };
 

@@ -5,6 +5,7 @@ import { toggleDarkMode } from "@/store/settingsSlice";
 import LoginModal from "./LoginModal";
 import CharacterAddModal from "./CharacterAddModal";
 import { CONTENT_IDS, CONTENT_BG_IMAGES } from "@/PC/content/constants";
+import { verifyAuth } from "@/api/authApi";
 
 const NAV_ITEMS = [
   { path: "/", label: "홈" },
@@ -22,15 +23,44 @@ function MainNav() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adventureName, setAdventureName] = useState("");
 
-  // 페이지 로드 시 localStorage에서 로그인 정보 확인
+  // 페이지 로드 시 localStorage에서 로그인 정보 확인 및 실제 인증 상태 검증
   useEffect(() => {
-    const savedId = localStorage.getItem("adventureId");
-    const savedName = localStorage.getItem("adventureName");
+    const checkAuth = async () => {
+      const savedId = localStorage.getItem("adventureId");
+      const savedName = localStorage.getItem("adventureName");
 
-    if (savedId && savedName) {
-      setIsLoggedIn(true);
-      setAdventureName(savedName);
-    }
+      // localStorage에 정보가 없으면 로그아웃 상태
+      if (!savedId || !savedName) {
+        setIsLoggedIn(false);
+        setAdventureName("");
+        return;
+      }
+
+      // localStorage에 정보가 있으면 실제 인증 상태 확인
+      try {
+        const userInfo = await verifyAuth();
+        if (userInfo && userInfo.id && userInfo.adventureName) {
+          // 인증 성공: localStorage와 서버 정보 동기화
+          localStorage.setItem("adventureId", userInfo.id);
+          localStorage.setItem("adventureName", userInfo.adventureName);
+          setIsLoggedIn(true);
+          setAdventureName(userInfo.adventureName);
+        } else {
+          // 인증 실패: localStorage 정리
+          localStorage.removeItem("adventureId");
+          localStorage.removeItem("adventureName");
+          setIsLoggedIn(false);
+          setAdventureName("");
+        }
+      } catch (error) {
+        // 네트워크 오류 등: localStorage 정보는 유지하되, 다음 API 호출 시 재검증
+        // 일단 localStorage 정보로 UI 표시 (토큰이 유효할 수도 있음)
+        setIsLoggedIn(true);
+        setAdventureName(savedName);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   const handleLoginSuccess = (result) => {

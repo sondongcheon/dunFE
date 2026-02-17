@@ -26,6 +26,7 @@
 import axios from "axios";
 import { getSafeErrorMessage } from "@/utils/errorMessage";
 import { AUTH_ENDPOINTS } from "@/api/endpoints";
+import { getDeviceId } from "@/utils/deviceId";
 
 // .env는 개발 서버 시작 시에만 주입됨. 수정 후에는 npm start 재실행 필요.
 const API_BASE_URL = `${process.env.REACT_APP_API_BASE_URL}`;
@@ -47,9 +48,12 @@ function isReissueRequest(config) {
 }
 
 // 요청 인터셉터
-// 모든 요청 전에 실행되며, 인증 토큰 추가 등의 공통 처리를 수행합니다.
+// 모든 요청 전에 실행되며, deviceId 헤더 추가 등의 공통 처리를 수행합니다.
 apiClient.interceptors.request.use(
     (config) => {
+        // 모든 요청에 deviceId 헤더 추가
+        const deviceId = getDeviceId();
+        config.headers["X-Device-Id"] = deviceId;
         return config;
     },
     (error) => {
@@ -76,14 +80,27 @@ apiClient.interceptors.response.use(
         if (isRetryable401) {
             config._retried = true;
             try {
-                await apiClient.post(AUTH_ENDPOINTS.REISSUE);
+                // 재발급 요청에도 deviceId 포함
+                const deviceId = getDeviceId();
+                await apiClient.post(
+                    AUTH_ENDPOINTS.REISSUE,
+                    { deviceId },
+                    {
+                        headers: {
+                            "X-Device-Id": deviceId,
+                        },
+                    }
+                );
                 return apiClient.request(config);
             } catch (reissueErr) {
                 const message = getSafeErrorMessage(
                     reissueErr,
                     "세션이 만료되었습니다. 다시 로그인해 주세요."
                 );
-                window.alert(message);
+                // 인증 확인 요청이 아닐 때만 알림 표시
+                if (!config._skipErrorAlert) {
+                    window.alert(message);
+                }
                 if (reissueErr.response) {
                     console.error("토큰 재발급 실패:", reissueErr.response.status, reissueErr.response.data);
                 } else {
@@ -93,8 +110,11 @@ apiClient.interceptors.response.use(
             }
         }
 
-        const message = getSafeErrorMessage(error, "오류가 발생했습니다.");
-        window.alert(message);
+        // 인증 확인 요청이 아닐 때만 알림 표시
+        if (!config._skipErrorAlert) {
+            const message = getSafeErrorMessage(error, "오류가 발생했습니다.");
+            window.alert(message);
+        }
 
         if (error.response) {
             console.error("API 에러:", error.response.status, error.response.data);

@@ -7,6 +7,7 @@
 
 import apiClient from "@/api/client";
 import { AUTH_ENDPOINTS } from "@/api/endpoints";
+import { getDeviceId } from "@/utils/deviceId";
 
 /**
  * 로그인
@@ -19,10 +20,20 @@ import { AUTH_ENDPOINTS } from "@/api/endpoints";
  */
 export async function login(adventureName, password) {
     try {
-        const response = await apiClient.post(AUTH_ENDPOINTS.LOGIN, {
-            adventureName,
-            password,
-        });
+        const deviceId = getDeviceId();
+        const response = await apiClient.post(
+            AUTH_ENDPOINTS.LOGIN,
+            {
+                adventureName,
+                password,
+                deviceId,
+            },
+            {
+                headers: {
+                    "X-Device-Id": deviceId,
+                },
+            }
+        );
         
         // 성공 시: { id, adventureName }
         // 쿠키로 accessToken, refreshToken이 자동 설정됨
@@ -51,7 +62,16 @@ export async function login(adventureName, password) {
  */
 export async function logout() {
     try {
-        await apiClient.post(AUTH_ENDPOINTS.LOGOUT);
+        const deviceId = getDeviceId();
+        await apiClient.post(
+            AUTH_ENDPOINTS.LOGOUT,
+            { deviceId },
+            {
+                headers: {
+                    "X-Device-Id": deviceId,
+                },
+            }
+        );
         // 로컬 스토리지 정리
         localStorage.removeItem("adventureId");
         localStorage.removeItem("adventureName");
@@ -61,5 +81,29 @@ export async function logout() {
         localStorage.removeItem("adventureId");
         localStorage.removeItem("adventureName");
         throw error;
+    }
+}
+
+/**
+ * 현재 로그인한 사용자 정보 확인 (인증 상태 검증용)
+ * 쿠키의 토큰이 유효한지 확인합니다.
+ * 인증 실패 시 알림을 띄우지 않습니다 (페이지 로드 시 조용히 검증).
+ * @returns {Promise<Object|null>} 성공 시 { id, adventureName } 반환, 실패 시 null
+ */
+export async function verifyAuth() {
+    try {
+        // 인터셉터에서 alert를 띄우지 않도록 config에 플래그 추가
+        const response = await apiClient.get(AUTH_ENDPOINTS.ME, {
+            _skipErrorAlert: true, // 인터셉터에서 알림 건너뛰기 플래그
+        });
+        return response.data; // { id, adventureName }
+    } catch (error) {
+        // 401 또는 기타 인증 실패 시 null 반환 (에러는 조용히 처리)
+        if (error.response?.status === 401 || error.response?.status === 403) {
+            return null;
+        }
+        // 네트워크 오류 등은 조용히 null 반환 (재시도는 하지 않음)
+        console.warn("인증 확인 중 오류 발생:", error);
+        return null;
     }
 }

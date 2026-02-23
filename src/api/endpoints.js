@@ -46,6 +46,11 @@ export const CONTENT_ENDPOINTS = {
     DETAIL: "/content",
 };
 
+// Home(방문자 통계) 관련 엔드포인트
+export const HOME_ENDPOINTS = {
+    TODAY: "/home/today",
+};
+
 // Board(공지·코멘트) 관련 엔드포인트
 export const BOARD_ENDPOINTS = {
     NOTICE: "/board/notice",

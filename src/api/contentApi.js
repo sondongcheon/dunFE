@@ -29,13 +29,36 @@ export async function fetchContentData(contentName) {
         });
         const data = response.data;
 
-        // 서버 응답 구조: { groups: [...], characters: [...], parties: [...] }
+        // 서버 응답 구조: { groups: [...], characters: [...], parties: { "1": {...}, "4": {...} } }
         const groups = Array.isArray(data.groups) ? data.groups : [];
         const characters = Array.isArray(data.characters) ? data.characters : [];
-        const parties = Array.isArray(data.parties) ? data.parties : [];
+        const partiesRaw = data.parties && typeof data.parties === "object" && !Array.isArray(data.parties)
+            ? data.parties
+            : {};
+
+        // parties: 객체 → 배열로 변환, 각 파티 내 adventures/groups도 객체 → 배열로 변환
+        const parties = Object.values(partiesRaw).map((party) => ({
+            id: party.id,
+            name: party.name,
+            leader: party.leader,
+            hasPassword: party.hasPassword,
+            adventures: Object.values(party.adventures || {}).map((adv) => ({
+                id: adv.id,
+                name: adv.name,
+                characters: Array.isArray(adv.characters) ? adv.characters : [],
+            })),
+            groups: Object.values(party.groups || {}).map((grp) => ({
+                id: grp.id,
+                name: grp.name ?? "",
+                members: (Array.isArray(grp.members) ? grp.members : []).map((m) => ({
+                    ...m,
+                    nickname: m.characterName ?? m.nickname ?? "",
+                    name: m.characterName ?? m.name ?? m.nickname ?? "",
+                })),
+            })),
+        }));
 
         // 캐릭터 데이터 매핑
-        // id → id, characterId → characterId (던담 링크용), nickname → name, fame → value, job → job, memo → memo, groupNum → groupNum, clearState → clearState, img → image, server → server
         const mappedCharacters = characters.map((item) => ({
             id: item.id,
             characterId: item.characterId ?? item.id,
@@ -44,7 +67,8 @@ export async function fetchContentData(contentName) {
             job: item.job || "",
             memo: item.memo || null,
             groupNum: item.groupNum || null,
-            clearState: typeof item.clearState === 'boolean' ? item.clearState : false,
+            groupId: item.groupId ?? null,
+            clearState: typeof item.clearState === "boolean" ? item.clearState : false,
             image: item.img || item.image || null,
             server: item.server || null,
         }));

@@ -57,6 +57,8 @@ function Characters({
   onClearState,
   canEditMemo = false,
   contentName,
+  /** true면 섹션 제목·필터 없이 그리드만 렌더 (공대편성 슬롯 등) */
+  hideHeader = false,
 }) {
   const [sectionExpanded, setSectionExpanded] = useState(true);
   const [filterMode, setFilterMode] = useState("include"); // "include" | "exclude"
@@ -67,6 +69,137 @@ function Characters({
     if (filterMode === "include") return characters;
     return characters.filter((c) => !addedCharacterIds.has(c.id));
   }, [characters, addedCharacterIds, filterMode]);
+
+  const renderCard = (character) => (
+    <div
+      key={character.id}
+      className={`relative flex gap-4 p-4 rounded-xl shadow-sm transition-all duration-200 min-w-0 ${
+        character.clearState
+          ? "bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-600 hover:shadow-md hover:border-green-400 dark:hover:border-green-500"
+          : "bg-amber-50/80 dark:bg-amber-900/15 border-2 border-amber-200 dark:border-amber-800 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700"
+      }`}
+    >
+      <div className="flex flex-col items-center flex-shrink-0">
+        <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 ring-2 ring-gray-100 dark:ring-gray-600">
+          <span className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl font-bold text-gray-500 dark:text-gray-400">
+            {(character.name || "?").charAt(0)}
+          </span>
+          {(character.image || character.img) && (
+            <img
+              src={character.image || character.img}
+              alt={character.name}
+              className="relative w-full h-full object-cover object-[center_100%] scale-125 bg-transparent"
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />
+          )}
+        </div>
+        {character.job && (
+          <span className="text-xs font-bold text-gray-900 dark:text-white mt-2 text-center truncate max-w-[5rem] sm:max-w-[5.5rem]">
+            {character.job}
+          </span>
+        )}
+        {character.characterId && character.server && (
+          <a
+            href={`https://dundam.xyz/character?server=${toServerIdForUrl(character.server)}&key=${character.characterId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 whitespace-nowrap"
+          >
+            던담이동
+          </a>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="w-full text-center mb-2">
+          {contentName &&
+          ALLOWED_CLEAR_STATE_CONTENTS.includes(contentName) &&
+          typeof onClearState === "function" ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (character.clearState) return;
+                if (clearingCharacterId !== null) return;
+                const contentLabel = CONTENT_IDS[contentName] ?? contentName;
+                const confirmed = window.confirm(
+                  `"${character.name}" 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`
+                );
+                if (!confirmed) return;
+                setClearingCharacterId(character.id);
+                onClearState([character.id]).finally(() => setClearingCharacterId(null));
+              }}
+              disabled={clearingCharacterId === character.id}
+              className={
+                character.clearState
+                  ? "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-default"
+                  : "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-pointer hover:underline focus:underline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              }
+              title={character.clearState ? undefined : "클릭 시 클리어 처리"}
+            >
+              {character.name}
+            </button>
+          ) : (
+            <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
+              {character.name}
+            </span>
+          )}
+        </div>
+        {character.groupNum !== null && character.groupNum !== undefined && (
+          <div className="flex flex-wrap items-center justify-center gap-1.5 mb-1">
+            <span
+              className="text-xs px-2 py-0.5 rounded-md font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 truncate max-w-[8rem]"
+              title={
+                groups.find((g) => g.id === character.groupNum)?.name ?? `그룹 ${character.groupNum}`
+              }
+            >
+              {groups.find((g) => g.id === character.groupNum)?.name ?? `그룹 ${character.groupNum}`}
+            </span>
+          </div>
+        )}
+        {(() => {
+          const partyGroups = getCharacterPartyGroups(character, parties);
+          if (partyGroups.length === 0) return null;
+          return (
+            <div className="flex flex-wrap items-center justify-center gap-1.5 mb-1">
+              {partyGroups.map((pg, i) => (
+                <span
+                  key={i}
+                  className="text-xs px-2 py-0.5 rounded-md font-medium bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 truncate max-w-[10rem]"
+                  title={`${pg.partyName} · ${pg.groupName}`}
+                >
+                  {pg.partyName} · {pg.groupName}
+                </span>
+              ))}
+            </div>
+          );
+        })()}
+        <div className="flex items-center justify-center mb-2">
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            명성 {character.value ?? character.fame ?? "-"}
+          </span>
+        </div>
+        <div className="text-center">
+          <EditableMemo
+            characterId={character.id}
+            memo={character.memo}
+            onSave={onMemoUpdate}
+            disabled={!canEditMemo}
+            className="block truncate"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  if (hideHeader) {
+    if (loading || !characters.length) return null;
+    return (
+      <div className="grid gap-3 grid-cols-1 min-w-0 w-full">
+        {characters.map((character) => renderCard(character))}
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -175,134 +308,7 @@ function Characters({
                 : "캐릭터가 없습니다."}
             </div>
           ) : (
-            displayCharacters.map((character) => (
-              <div
-                key={character.id}
-                className={`relative flex gap-4 p-4 rounded-xl shadow-sm transition-all duration-200 ${
-                  character.clearState
-                    ? "bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-600 hover:shadow-md hover:border-green-400 dark:hover:border-green-500"
-                    : "bg-amber-50/80 dark:bg-amber-900/15 border-2 border-amber-200 dark:border-amber-800 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700"
-                }`}
-              >
-                <div className="flex flex-col items-center flex-shrink-0">
-                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 ring-2 ring-gray-100 dark:ring-gray-600">
-                    <span className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl font-bold text-gray-500 dark:text-gray-400">
-                      {character.name.charAt(0) || "?"}
-                    </span>
-                    {character.image && (
-                      <img
-                        src={character.image}
-                        alt={character.name}
-                        className="relative w-full h-full object-cover object-[center_100%] scale-125 bg-transparent"
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                        }}
-                      />
-                    )}
-                  </div>
-                  {character.job && (
-                    <span className="text-xs font-bold text-gray-900 dark:text-white mt-2 text-center truncate max-w-[5rem] sm:max-w-[5.5rem]">
-                      {character.job}
-                    </span>
-                  )}
-                  {character.characterId && character.server && (
-                    <a
-                      href={`https://dundam.xyz/character?server=${toServerIdForUrl(
-                        character.server
-                      )}&key=${character.characterId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 whitespace-nowrap"
-                    >
-                      던담이동
-                    </a>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="w-full text-center mb-2">
-                    {contentName &&
-                    ALLOWED_CLEAR_STATE_CONTENTS.includes(contentName) &&
-                    typeof onClearState === "function" ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (character.clearState) return;
-                          if (clearingCharacterId !== null) return;
-                          const contentLabel = CONTENT_IDS[contentName] ?? contentName;
-                          const confirmed = window.confirm(
-                            `"${character.name}" 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`
-                          );
-                          if (!confirmed) return;
-                          setClearingCharacterId(character.id);
-                          onClearState([character.id]).finally(() => setClearingCharacterId(null));
-                        }}
-                        disabled={clearingCharacterId === character.id}
-                        className={
-                          character.clearState
-                            ? "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-default"
-                            : "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-pointer hover:underline focus:underline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                        }
-                        title={character.clearState ? undefined : "클릭 시 클리어 처리"}
-                      >
-                        {character.name}
-                      </button>
-                    ) : (
-                      <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
-                        {character.name}
-                      </span>
-                    )}
-                  </div>
-                  {/* 1줄: 그룹명 (private 그룹 소속 시) */}
-                  {character.groupNum !== null && character.groupNum !== undefined && (
-                    <div className="flex flex-wrap items-center justify-center gap-1.5 mb-1">
-                      <span
-                        className="text-xs px-2 py-0.5 rounded-md font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 truncate max-w-[8rem]"
-                        title={
-                          groups.find((g) => g.id === character.groupNum)?.name ??
-                          `그룹 ${character.groupNum}`
-                        }
-                      >
-                        {groups.find((g) => g.id === character.groupNum)?.name ??
-                          `그룹 ${character.groupNum}`}
-                      </span>
-                    </div>
-                  )}
-                  {/* 2줄: 소속 파티·파티그룹 (있을 경우) */}
-                  {(() => {
-                    const partyGroups = getCharacterPartyGroups(character, parties);
-                    if (partyGroups.length === 0) return null;
-                    return (
-                      <div className="flex flex-wrap items-center justify-center gap-1.5 mb-1">
-                        {partyGroups.map((pg, i) => (
-                          <span
-                            key={i}
-                            className="text-xs px-2 py-0.5 rounded-md font-medium bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 truncate max-w-[10rem]"
-                            title={`${pg.partyName} · ${pg.groupName}`}
-                          >
-                            {pg.partyName} · {pg.groupName}
-                          </span>
-                        ))}
-                      </div>
-                    );
-                  })()}
-                  {/* 3줄: 명성 */}
-                  <div className="flex items-center justify-center mb-2">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      명성 {character.value}
-                    </span>
-                  </div>
-                  <div className="text-center">
-                    <EditableMemo
-                      characterId={character.id}
-                      memo={character.memo}
-                      onSave={onMemoUpdate}
-                      disabled={!canEditMemo}
-                      className="block truncate"
-                    />
-                  </div>
-                </div>
-              </div>
-            ))
+            displayCharacters.map((character) => renderCard(character))
           )}
         </div>
       )}

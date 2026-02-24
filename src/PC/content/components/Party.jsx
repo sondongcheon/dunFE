@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import EditableMemo from "./EditableMemo";
 import { toServerIdForUrl } from "@/utils/serverMapping";
 import { CONTENT_IDS } from "../constants";
@@ -251,7 +252,7 @@ function Party({
         adventureName: adv.name,
         adventureId: adv.id,
         name: char.name ?? char.nickname ?? "",
-      }))
+      })),
     );
     return flat.filter((char) => {
       const key = char.characterId ?? char.id;
@@ -395,7 +396,7 @@ function Party({
                 const partyGroups = party.groups || [];
                 const memberCount = partyGroups.reduce(
                   (acc, g) => acc + (g.members?.length || 0),
-                  0
+                  0,
                 );
 
                 return (
@@ -477,7 +478,7 @@ function Party({
                               e.stopPropagation();
                               if (
                                 window.confirm(
-                                  `"${party.name}" 파티를 삭제하시겠습니까?\n파티 내 모든 그룹과 멤버가 삭제됩니다.`
+                                  `"${party.name}" 파티를 삭제하시겠습니까?\n파티 내 모든 그룹과 멤버가 삭제됩니다.`,
                                 )
                               ) {
                                 onRemoveParty(party.id);
@@ -496,98 +497,122 @@ function Party({
 
                     {isPartyExpanded && (
                       <div className="border-t border-purple-200 dark:border-purple-700 px-3 py-3 space-y-3">
-                        {/* 참여 모험단 목록 (adventures: [{ id, name, characters }]) */}
-                        {party.adventures && party.adventures.length > 0 && (
-                          <div className="mb-3">
-                            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
-                              참여 모험단
+                        {/* 참여 모험단 + 모험단 초대 (리더일 때 버튼을 참여 모험단 옆에 표시) */}
+                        {(party.adventures && party.adventures.length > 0) || isMyParty ? (
+                          <div className="mb-3 flex min-h-[2.5rem]">
+                            {/* 왼쪽: 공대편성 (라우터 이동) */}
+                            <div
+                              className="w-[30%] max-w-[120px] flex-shrink-0 flex flex-col pr-3 border-r border-purple-200 dark:border-purple-700"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Link
+                                to={{
+                                  pathname: `/content/${contentName}/party/${party.id}`,
+                                  state: {
+                                    contentName,
+                                    party,
+                                    groupMembersByAdventure: groupMembersByAdventure(
+                                      (party.groups || []).flatMap((g) => g.members || []),
+                                    ),
+                                  },
+                                }}
+                                className="h-full min-h-[2.5rem] flex items-center justify-center px-2 py-2 text-xs font-medium rounded-md text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                              >
+                                [공대편성]
+                              </Link>
                             </div>
-                            <div className="flex flex-wrap gap-2">
-                              {party.adventures.map((adv) => {
-                                const currentAdventureId = localStorage.getItem("adventureId");
-                                const currentAdventureName = localStorage.getItem("adventureName");
-                                const isMe =
-                                  (currentAdventureId != null &&
-                                    String(adv.id) === String(currentAdventureId)) ||
-                                  (currentAdventureName != null &&
-                                    adv.name === currentAdventureName);
-                                return (
-                                  <span
-                                    key={adv.id ?? adv.name}
-                                    className={`text-xs px-2 py-1 rounded ${
-                                      isMe
-                                        ? "bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300"
-                                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                                    }`}
-                                  >
-                                    {adv.name}
-                                    {isMe && " (나)"}
-                                  </span>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* 모험단 초대 (리더인 경우에만) */}
-                        {isMyParty && (
-                          <div className="mb-3">
-                            {isInviting ? (
-                              <>
-                                <div className="flex gap-2">
-                                  <input
-                                    type="text"
-                                    value={inviteAdventureId}
-                                    onChange={(e) => setInviteAdventureId(e.target.value)}
-                                    onKeyDown={(e) => e.key === "Enter" && handleInvite(party.id)}
-                                    placeholder="초대할 모험단 이름"
-                                    className="flex-1 px-2 py-1 text-xs border border-purple-300 dark:border-purple-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500"
-                                    onClick={(e) => e.stopPropagation()}
-                                  />
+                            {/* 오른쪽: 참여 모험단 + 초대 */}
+                            <div className="flex-1 min-w-0 pl-3">
+                              <div className="flex items-center justify-between gap-2 mb-2">
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                  참여 모험단
+                                </div>
+                                {isMyParty && !(inviteTargetPartyId === party.id && isInviting) && (
                                   <button
                                     type="button"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      handleInvite(party.id);
-                                    }}
-                                    className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-500"
-                                  >
-                                    초대
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setInviteTargetPartyId(null);
-                                      setInviteAdventureId("");
+                                      setInviteTargetPartyId(party.id);
                                       setInviteError("");
                                     }}
-                                    className="px-2 py-1 text-xs text-gray-500 hover:underline"
+                                    className="text-xs text-purple-600 dark:text-purple-400 hover:underline whitespace-nowrap"
                                   >
-                                    취소
+                                    + 모험단 초대
                                   </button>
-                                </div>
-                                {inviteError && (
-                                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                                    {inviteError}
-                                  </p>
                                 )}
-                              </>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setInviteTargetPartyId(party.id);
-                                  setInviteError("");
-                                }}
-                                className="text-xs text-purple-600 dark:text-purple-400 hover:underline"
-                              >
-                                + 모험단 초대
-                              </button>
-                            )}
+                              </div>
+                              {party.adventures && party.adventures.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                  {party.adventures.map((adv) => {
+                                    const currentAdventureId = localStorage.getItem("adventureId");
+                                    const currentAdventureName =
+                                      localStorage.getItem("adventureName");
+                                    const isMe =
+                                      (currentAdventureId != null &&
+                                        String(adv.id) === String(currentAdventureId)) ||
+                                      (currentAdventureName != null &&
+                                        adv.name === currentAdventureName);
+                                    return (
+                                      <span
+                                        key={adv.id ?? adv.name}
+                                        className={`text-xs px-2 py-1 rounded ${
+                                          isMe
+                                            ? "bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300"
+                                            : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                                        }`}
+                                      >
+                                        {adv.name}
+                                        {isMe && " (나)"}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                              {isMyParty && inviteTargetPartyId === party.id && isInviting && (
+                                <>
+                                  <div className="flex gap-2 mt-2">
+                                    <input
+                                      type="text"
+                                      value={inviteAdventureId}
+                                      onChange={(e) => setInviteAdventureId(e.target.value)}
+                                      onKeyDown={(e) => e.key === "Enter" && handleInvite(party.id)}
+                                      placeholder="초대할 모험단 이름"
+                                      className="flex-1 px-2 py-1 text-xs border border-purple-300 dark:border-purple-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500"
+                                      onClick={(e) => e.stopPropagation()}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleInvite(party.id);
+                                      }}
+                                      className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-500"
+                                    >
+                                      초대
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setInviteTargetPartyId(null);
+                                        setInviteAdventureId("");
+                                        setInviteError("");
+                                      }}
+                                      className="px-2 py-1 text-xs text-gray-500 hover:underline"
+                                    >
+                                      취소
+                                    </button>
+                                  </div>
+                                  {inviteError && (
+                                    <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                      {inviteError}
+                                    </p>
+                                  )}
+                                </>
+                              )}
+                            </div>
                           </div>
-                        )}
+                        ) : null}
 
                         {/* Groups (Party 내 그룹) */}
                         <div className="space-y-2">
@@ -728,7 +753,7 @@ function Party({
                                             e.stopPropagation();
                                             if (
                                               window.confirm(
-                                                `"${group.name}" 그룹을 삭제하시겠습니까?`
+                                                `"${group.name}" 그룹을 삭제하시겠습니까?`,
                                               )
                                             ) {
                                               onRemovePartyGroup(group.id);
@@ -758,206 +783,230 @@ function Party({
                                           </div>
                                         ) : (
                                           <div className="space-y-4">
-                                            {groupMembersByAdventure(members).map(({ adventureId, adventureName, members: advMembers }) => (
-                                              <div key={adventureId}>
-                                                <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-2">
-                                                  {adventureName}
-                                                </div>
-                                                <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                                                  {advMembers.map((member) => {
-                                              // member.id: 내 데이터의 내부 ID, member.characterId: 네오플 ID
-                                              const myInternalId = member.id ?? member.characterId;
-                                              const neopleCharacterId =
-                                                member.characterId ?? member.id;
-                                              const isMyCharacter = myCharacterIds.has(member.id);
-                                              const charFromList = characters.find(
-                                                (c) =>
-                                                  c.id === member.id ||
-                                                  c.characterId === member.characterId
-                                              );
-                                              const displayValue =
-                                                member.fame ??
-                                                member.value ??
-                                                charFromList?.value ??
-                                                0;
-                                              const rawClearState =
-                                                member.clearState ?? member.clear_state;
-                                              const displayClearState =
-                                                typeof rawClearState === "boolean"
-                                                  ? rawClearState
-                                                  : charFromList?.clearState;
-                                              const displayMemo =
-                                                member.memo ?? charFromList?.memo ?? null;
-                                              const displayImage =
-                                                member.img ??
-                                                member.image ??
-                                                charFromList?.image ??
-                                                null;
-                                              const isClear =
-                                                typeof displayClearState === "boolean" &&
-                                                displayClearState;
-                                              return (
-                                                <div
-                                                  key={
-                                                    myInternalId ??
-                                                    neopleCharacterId ??
-                                                    `member-${members.indexOf(member)}`
-                                                  }
-                                                  className={`relative flex gap-4 p-4 rounded-xl shadow-sm transition-all duration-200 ${
-                                                    isClear
-                                                      ? "bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-600 hover:shadow-md hover:border-green-400 dark:hover:border-green-500"
-                                                      : "bg-amber-50/80 dark:bg-amber-900/15 border-2 border-amber-200 dark:border-amber-800 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700"
-                                                  }`}
-                                                >
-                                                  <div className="flex flex-col items-center flex-shrink-0">
-                                                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 ring-2 ring-gray-100 dark:ring-gray-600">
-                                                      <span className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl font-bold text-gray-500 dark:text-gray-400">
-                                                        {(member.nickname ?? "").charAt(0) || "?"}
-                                                      </span>
-                                                      {displayImage && (
-                                                        <img
-                                                          src={displayImage}
-                                                          alt={member.nickname ?? ""}
-                                                          className="relative w-full h-full object-cover object-[center_100%] scale-125"
-                                                          onError={(e) => {
-                                                            e.target.style.display = "none";
-                                                          }}
-                                                        />
-                                                      )}
-                                                    </div>
-                                                    {(member.job || charFromList?.job) && (
-                                                      <span className="text-xs font-bold text-gray-900 dark:text-white mt-2 text-center truncate max-w-[5rem] sm:max-w-[5.5rem]">
-                                                        {member.job ?? charFromList?.job}
-                                                      </span>
-                                                    )}
-                                                    <div className="mt-2 flex items-center justify-center gap-1 flex-wrap">
-                                                      <button
-                                                        type="button"
-                                                        onClick={(e) => {
-                                                          e.stopPropagation();
-                                                          onRemoveCharacterFromPublicGroup?.(
-                                                            group.id,
-                                                            member.id ?? member.characterId,
-                                                            contentName
-                                                          );
-                                                        }}
-                                                        className="text-[10px] px-1.5 py-0.5 text-red-600 dark:text-red-400 hover:underline"
-                                                      >
-                                                        제거
-                                                      </button>
-                                                      {(neopleCharacterId ??
-                                                        charFromList?.characterId) &&
-                                                        (member.server ?? charFromList?.server) && (
-                                                          <a
-                                                            href={`https://dundam.xyz/character?server=${toServerIdForUrl(
-                                                              member.server ??
-                                                                charFromList?.server ??
-                                                                ""
-                                                            )}&key=${
-                                                              neopleCharacterId ??
-                                                              charFromList?.characterId ??
-                                                              ""
-                                                            }`}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 whitespace-nowrap"
-                                                          >
-                                                            던담이동
-                                                          </a>
-                                                        )}
-                                                    </div>
+                                            {groupMembersByAdventure(members).map(
+                                              ({
+                                                adventureId,
+                                                adventureName,
+                                                members: advMembers,
+                                              }) => (
+                                                <div key={adventureId}>
+                                                  <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-2">
+                                                    {adventureName}
                                                   </div>
-                                                  <div className="flex-1 min-w-0">
-                                                    <div className="w-full text-center mb-2">
-                                                      {contentName &&
-                                                      ALLOWED_CLEAR_STATE_CONTENTS.includes(
-                                                        contentName
-                                                      ) &&
-                                                      typeof onClearState === "function" &&
-                                                      isMyCharacter ? (
-                                                        <button
-                                                          type="button"
-                                                          onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            if (isClear) return;
-                                                            if (clearingCharacterId !== null)
-                                                              return;
-                                                            const characterId =
-                                                              member.id ?? member.characterId;
-                                                            const contentLabel =
-                                                              CONTENT_IDS[contentName] ??
-                                                              contentName;
-                                                            const confirmed = window.confirm(
-                                                              `"${
-                                                                member.nickname ?? ""
-                                                              }" 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`
-                                                            );
-                                                            if (!confirmed) return;
-                                                            setClearingCharacterId(characterId);
-                                                            onClearState([characterId]).finally(
-                                                              () => setClearingCharacterId(null)
-                                                            );
-                                                          }}
-                                                          disabled={
-                                                            clearingCharacterId ===
-                                                            (member.id ?? member.characterId)
+                                                  <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                                                    {advMembers.map((member) => {
+                                                      // member.id: 내 데이터의 내부 ID, member.characterId: 네오플 ID
+                                                      const myInternalId =
+                                                        member.id ?? member.characterId;
+                                                      const neopleCharacterId =
+                                                        member.characterId ?? member.id;
+                                                      const isMyCharacter = myCharacterIds.has(
+                                                        member.id,
+                                                      );
+                                                      const charFromList = characters.find(
+                                                        (c) =>
+                                                          c.id === member.id ||
+                                                          c.characterId === member.characterId,
+                                                      );
+                                                      const displayValue =
+                                                        member.fame ??
+                                                        member.value ??
+                                                        charFromList?.value ??
+                                                        0;
+                                                      const rawClearState =
+                                                        member.clearState ?? member.clear_state;
+                                                      const displayClearState =
+                                                        typeof rawClearState === "boolean"
+                                                          ? rawClearState
+                                                          : charFromList?.clearState;
+                                                      const displayMemo =
+                                                        member.memo ?? charFromList?.memo ?? null;
+                                                      const displayImage =
+                                                        member.img ??
+                                                        member.image ??
+                                                        charFromList?.image ??
+                                                        null;
+                                                      const isClear =
+                                                        typeof displayClearState === "boolean" &&
+                                                        displayClearState;
+                                                      return (
+                                                        <div
+                                                          key={
+                                                            myInternalId ??
+                                                            neopleCharacterId ??
+                                                            `member-${members.indexOf(member)}`
                                                           }
-                                                          className={
+                                                          className={`relative flex gap-4 p-4 rounded-xl shadow-sm transition-all duration-200 ${
                                                             isClear
-                                                              ? "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-default"
-                                                              : "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-pointer hover:underline focus:underline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                                          }
-                                                          title={
-                                                            isClear
-                                                              ? undefined
-                                                              : "클릭 시 클리어 처리"
-                                                          }
+                                                              ? "bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-600 hover:shadow-md hover:border-green-400 dark:hover:border-green-500"
+                                                              : "bg-amber-50/80 dark:bg-amber-900/15 border-2 border-amber-200 dark:border-amber-800 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700"
+                                                          }`}
                                                         >
-                                                          {member.nickname ?? ""}
-                                                        </button>
-                                                      ) : (
-                                                        <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
-                                                          {member.nickname ?? ""}
-                                                        </span>
-                                                      )}
-                                                    </div>
-                                                    {(member.adventureName || member.server) && (
-                                                      <div className="text-xs text-center mb-2 flex flex-wrap justify-center items-center gap-x-1.5">
-                                                        {member.adventureName && (
-                                                          <span className="text-purple-600 dark:text-purple-400">
-                                                            ({member.adventureName})
-                                                          </span>
-                                                        )}
-                                                        {member.server && (
-                                                          <span className="text-gray-500 dark:text-gray-400">
-                                                            [{member.server}]
-                                                          </span>
-                                                        )}
-                                                      </div>
-                                                    )}
-                                                    <div className="flex flex-wrap items-center justify-center gap-1.5 mb-2">
-                                                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                                                        명성 {displayValue}
-                                                      </span>
-                                                    </div>
-                                                    <div className="text-center">
-                                                      <EditableMemo
-                                                        characterId={
-                                                          member.id ?? member.characterId
-                                                        }
-                                                        memo={displayMemo}
-                                                        onSave={onMemoUpdate}
-                                                        disabled={!canEditMemo || !isMyCharacter}
-                                                        className="block truncate"
-                                                      />
-                                                    </div>
+                                                          <div className="flex flex-col items-center flex-shrink-0">
+                                                            <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 ring-2 ring-gray-100 dark:ring-gray-600">
+                                                              <span className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl font-bold text-gray-500 dark:text-gray-400">
+                                                                {(member.nickname ?? "").charAt(
+                                                                  0,
+                                                                ) || "?"}
+                                                              </span>
+                                                              {displayImage && (
+                                                                <img
+                                                                  src={displayImage}
+                                                                  alt={member.nickname ?? ""}
+                                                                  className="relative w-full h-full object-cover object-[center_100%] scale-125"
+                                                                  onError={(e) => {
+                                                                    e.target.style.display = "none";
+                                                                  }}
+                                                                />
+                                                              )}
+                                                            </div>
+                                                            {(member.job || charFromList?.job) && (
+                                                              <span className="text-xs font-bold text-gray-900 dark:text-white mt-2 text-center truncate max-w-[5rem] sm:max-w-[5.5rem]">
+                                                                {member.job ?? charFromList?.job}
+                                                              </span>
+                                                            )}
+                                                            <div className="mt-2 flex items-center justify-center gap-1 flex-wrap">
+                                                              <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                  e.stopPropagation();
+                                                                  onRemoveCharacterFromPublicGroup?.(
+                                                                    group.id,
+                                                                    member.id ?? member.characterId,
+                                                                    contentName,
+                                                                  );
+                                                                }}
+                                                                className="text-[10px] px-1.5 py-0.5 text-red-600 dark:text-red-400 hover:underline"
+                                                              >
+                                                                제거
+                                                              </button>
+                                                              {(neopleCharacterId ??
+                                                                charFromList?.characterId) &&
+                                                                (member.server ??
+                                                                  charFromList?.server) && (
+                                                                  <a
+                                                                    href={`https://dundam.xyz/character?server=${toServerIdForUrl(
+                                                                      member.server ??
+                                                                        charFromList?.server ??
+                                                                        "",
+                                                                    )}&key=${
+                                                                      neopleCharacterId ??
+                                                                      charFromList?.characterId ??
+                                                                      ""
+                                                                    }`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 whitespace-nowrap"
+                                                                  >
+                                                                    던담이동
+                                                                  </a>
+                                                                )}
+                                                            </div>
+                                                          </div>
+                                                          <div className="flex-1 min-w-0">
+                                                            <div className="w-full text-center mb-2">
+                                                              {contentName &&
+                                                              ALLOWED_CLEAR_STATE_CONTENTS.includes(
+                                                                contentName,
+                                                              ) &&
+                                                              typeof onClearState === "function" &&
+                                                              isMyCharacter ? (
+                                                                <button
+                                                                  type="button"
+                                                                  onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    if (isClear) return;
+                                                                    if (
+                                                                      clearingCharacterId !== null
+                                                                    )
+                                                                      return;
+                                                                    const characterId =
+                                                                      member.id ??
+                                                                      member.characterId;
+                                                                    const contentLabel =
+                                                                      CONTENT_IDS[contentName] ??
+                                                                      contentName;
+                                                                    const confirmed =
+                                                                      window.confirm(
+                                                                        `"${
+                                                                          member.nickname ?? ""
+                                                                        }" 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`,
+                                                                      );
+                                                                    if (!confirmed) return;
+                                                                    setClearingCharacterId(
+                                                                      characterId,
+                                                                    );
+                                                                    onClearState([
+                                                                      characterId,
+                                                                    ]).finally(() =>
+                                                                      setClearingCharacterId(null),
+                                                                    );
+                                                                  }}
+                                                                  disabled={
+                                                                    clearingCharacterId ===
+                                                                    (member.id ??
+                                                                      member.characterId)
+                                                                  }
+                                                                  className={
+                                                                    isClear
+                                                                      ? "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-default"
+                                                                      : "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-pointer hover:underline focus:underline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                  }
+                                                                  title={
+                                                                    isClear
+                                                                      ? undefined
+                                                                      : "클릭 시 클리어 처리"
+                                                                  }
+                                                                >
+                                                                  {member.nickname ?? ""}
+                                                                </button>
+                                                              ) : (
+                                                                <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
+                                                                  {member.nickname ?? ""}
+                                                                </span>
+                                                              )}
+                                                            </div>
+                                                            {(member.adventureName ||
+                                                              member.server) && (
+                                                              <div className="text-xs text-center mb-2 flex flex-wrap justify-center items-center gap-x-1.5">
+                                                                {member.adventureName && (
+                                                                  <span className="text-purple-600 dark:text-purple-400">
+                                                                    ({member.adventureName})
+                                                                  </span>
+                                                                )}
+                                                                {member.server && (
+                                                                  <span className="text-gray-500 dark:text-gray-400">
+                                                                    [{member.server}]
+                                                                  </span>
+                                                                )}
+                                                              </div>
+                                                            )}
+                                                            <div className="flex flex-wrap items-center justify-center gap-1.5 mb-2">
+                                                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                                명성 {displayValue}
+                                                              </span>
+                                                            </div>
+                                                            <div className="text-center">
+                                                              <EditableMemo
+                                                                characterId={
+                                                                  member.id ?? member.characterId
+                                                                }
+                                                                memo={displayMemo}
+                                                                onSave={onMemoUpdate}
+                                                                disabled={
+                                                                  !canEditMemo || !isMyCharacter
+                                                                }
+                                                                className="block truncate"
+                                                              />
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      );
+                                                    })}
                                                   </div>
                                                 </div>
-                                              );
-                                            })}
-                                                </div>
-                                              </div>
-                                            ))}
+                                              ),
+                                            )}
                                           </div>
                                         )}
                                       </div>
@@ -976,35 +1025,51 @@ function Party({
                                             ) : (
                                               <div className="space-y-2">
                                                 {(() => {
-                                                  const byAdv = addableCharacters.reduce((acc, char) => {
-                                                    const key = String(char.adventureId ?? char.adventureName ?? "");
-                                                    if (!acc[key]) acc[key] = { name: char.adventureName ?? "알 수 없음", chars: [] };
-                                                    acc[key].chars.push(char);
-                                                    return acc;
-                                                  }, {});
-                                                  return Object.entries(byAdv).map(([advKey, { name, chars }]) => (
-                                                    <div key={advKey}>
-                                                      <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">
-                                                        {name}
+                                                  const byAdv = addableCharacters.reduce(
+                                                    (acc, char) => {
+                                                      const key = String(
+                                                        char.adventureId ??
+                                                          char.adventureName ??
+                                                          "",
+                                                      );
+                                                      if (!acc[key])
+                                                        acc[key] = {
+                                                          name: char.adventureName ?? "알 수 없음",
+                                                          chars: [],
+                                                        };
+                                                      acc[key].chars.push(char);
+                                                      return acc;
+                                                    },
+                                                    {},
+                                                  );
+                                                  return Object.entries(byAdv).map(
+                                                    ([advKey, { name, chars }]) => (
+                                                      <div key={advKey}>
+                                                        <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">
+                                                          {name}
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-1">
+                                                          {chars.map((char) => (
+                                                            <button
+                                                              key={char.characterId ?? char.id}
+                                                              type="button"
+                                                              onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleAddCharacter(
+                                                                  group.id,
+                                                                  char.id,
+                                                                );
+                                                              }}
+                                                              className="px-2 py-1 text-xs bg-purple-100 dark:bg-purple-800 rounded hover:bg-purple-200 dark:hover:bg-purple-700 text-purple-700 dark:text-purple-300"
+                                                              title={char.name}
+                                                            >
+                                                              {char.name}
+                                                            </button>
+                                                          ))}
+                                                        </div>
                                                       </div>
-                                                      <div className="flex flex-wrap gap-1">
-                                                        {chars.map((char) => (
-                                                          <button
-                                                            key={char.characterId ?? char.id}
-                                                            type="button"
-                                                            onClick={(e) => {
-                                                              e.stopPropagation();
-                                                              handleAddCharacter(group.id, char.id);
-                                                            }}
-                                                            className="px-2 py-1 text-xs bg-purple-100 dark:bg-purple-800 rounded hover:bg-purple-200 dark:hover:bg-purple-700 text-purple-700 dark:text-purple-300"
-                                                            title={char.name}
-                                                          >
-                                                            {char.name}
-                                                          </button>
-                                                        ))}
-                                                      </div>
-                                                    </div>
-                                                  ));
+                                                    ),
+                                                  );
                                                 })()}
                                                 <button
                                                   type="button"

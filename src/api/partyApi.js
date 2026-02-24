@@ -221,3 +221,81 @@ export async function removePartyMember(content, partyGroupId, characterId) {
         throw error;
     }
 }
+
+/** 팀당 슬롯 수 (순서 유지용) */
+const SLOTS_PER_TEAM = 4;
+
+/**
+ * 슬롯 순서를 유지한 채 서버용 배열로 변환.
+ * 1번째 칸=인덱스0, 4번째 칸=인덱스3 등 순서 그대로, 빈 칸은 null.
+ */
+function toOrderedLongList(arr) {
+    if (!Array.isArray(arr)) return Array(SLOTS_PER_TEAM).fill(null);
+    return Array.from({ length: SLOTS_PER_TEAM }, (_, i) => {
+        const id = arr[i];
+        if (id == null || id === "") return null;
+        const n = Number(id);
+        return Number.isFinite(n) ? n : null;
+    });
+}
+
+/**
+ * 단일 공대편성 DTO로 변환 (서버 Request body 1건)
+ */
+function toFormationDto(contentName, partyId, raid) {
+    const teams = raid.teams || {};
+    return {
+        contentName,
+        partyId: String(partyId),
+        order: Number(raid.order),
+        name: raid.name || "",
+        teams: {
+            red: toOrderedLongList(teams.RED),
+            yellow: toOrderedLongList(teams.YELLOW),
+            green: toOrderedLongList(teams.GREEN),
+        },
+    };
+}
+
+/**
+ * 공대편성 조회 (GET)
+ * Response: [{ order, name, teams: { red, yellow, green } }, ...] — order 순서, teams는 슬롯 순서 유지 (null = 빈 칸)
+ */
+export async function getPartyFormation(contentName, partyId) {
+    const response = await apiClient.get(PARTY_ENDPOINTS.FORMATION, {
+        params: { contentName, partyId: String(partyId) },
+    });
+    return Array.isArray(response.data) ? response.data : [];
+}
+
+/**
+ * 공대편성 페이지 첫 로딩 (캐릭터 목록 + 편성 한 번에)
+ * GET /content/party/formation/page?contentName=...&partyId=...&adventureId=... (adventureId 임시)
+ * Response: { characterList: { id, name, adventures: {}, groups: {} }, formationList: [{ order, name, teams }] }
+ */
+export async function getPartyFormationPage(contentName, partyId, adventureId = 1) {
+    const response = await apiClient.get(PARTY_ENDPOINTS.FORMATION_PAGE, {
+        params: {
+            contentName,
+            partyId: String(partyId),
+            adventureId: Number(adventureId) || 1,
+        },
+    });
+    console.log(response.data);
+    return response.data || {};
+}
+
+/**
+ * 공대편성 저장 (PUT) — 공대별로 단일 DTO씩 PUT 요청
+ * Request DTO 1건: contentName, partyId, order, name, teams(red, yellow, green: List<Long>)
+ */
+export async function savePartyFormation(contentName, partyId, raids) {
+    const list = raids || [];
+    let lastData = null;
+    for (const raid of list) {
+        const body = toFormationDto(contentName, partyId, raid);
+        const response = await apiClient.put(PARTY_ENDPOINTS.FORMATION, body);
+        lastData = response.data;
+    }
+    return lastData;
+}

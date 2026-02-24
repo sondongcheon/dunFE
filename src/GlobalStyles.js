@@ -55,7 +55,7 @@ const GlobalStyles = createGlobalStyle`
     min-height: 100vh;
     margin: 0 auto;
     margin-top: 20px;
-    padding: 0 16px 24px;
+    padding: 0 12px 24px;
     padding-bottom: calc(3.5rem + 24px + env(safe-area-inset-bottom)); /* 하단 Nav(56px) + 여백 + iOS 안전 영역 */
     box-sizing: border-box;
   }
@@ -80,8 +80,8 @@ const GlobalStyles = createGlobalStyle`
 
     .mainMobileBody {
       margin-top: 20px;
-      padding-left: calc(16px + env(safe-area-inset-left));
-      padding-right: calc(16px + env(safe-area-inset-right));
+      padding-left: calc(12px + env(safe-area-inset-left));
+      padding-right: calc(12px + env(safe-area-inset-right));
       padding-bottom: calc(3.5rem + 24px + env(safe-area-inset-bottom));
     }
   }
@@ -89,9 +89,9 @@ const GlobalStyles = createGlobalStyle`
   /* 작은 모바일 화면 */
   @media (max-width: 360px) {
     .mainMobileBody {
-      padding: 0 12px 20px;
-      padding-left: calc(12px + env(safe-area-inset-left));
-      padding-right: calc(12px + env(safe-area-inset-right));
+      padding: 0 8px 20px;
+      padding-left: calc(8px + env(safe-area-inset-left));
+      padding-right: calc(8px + env(safe-area-inset-right));
       padding-bottom: calc(3.5rem + 20px + env(safe-area-inset-bottom));
     }
   }

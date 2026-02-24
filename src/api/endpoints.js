@@ -69,4 +69,8 @@ export const PARTY_ENDPOINTS = {
     DELETE_GROUP: "/content/party/group",
     ADD_MEMBER: "/content/party/group/member",
     REMOVE_MEMBER: "/content/party/group/member",
+    /** 공대편성 조회 (GET) / 저장 (PUT) - content/party/formation */
+    FORMATION: "/content/party/formation",
+    /** 공대편성 페이지 첫 로딩 (캐릭터 목록 + 편성 한 번에) - content/party/formation/page */
+    FORMATION_PAGE: "/content/party/formation/page",
 };

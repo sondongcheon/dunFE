@@ -6,6 +6,7 @@ import PCTest1Page from "./PC/test/Test1Page";
 import PCTest2Page from "./PC/test/Test2Page";
 import PCContentMainPage from "@/PC/content/contentMain";
 import PCContentDetailPage from "@/PC/content/contentDetail";
+import PCContentPartyPage from "@/PC/content/contentPartyPage";
 import PCAdminPage from "@/PC/admin/AdminPage";
 import PCAdminNoticePage from "@/PC/admin/AdminNoticePage";
 import PCAdminTodayPage from "@/PC/admin/AdminTodayPage";
@@ -17,6 +18,7 @@ import MobileTest1Page from "./MOBILE/test/Test1Page";
 import MobileTest2Page from "./MOBILE/test/Test2Page";
 import MobileContentMainPage from "./MOBILE/content/contentMain";
 import MobileContentDetailPage from "./MOBILE/content/contentDetail";
+import MobileContentPartyPage from "./MOBILE/content/contentPartyPage";
 import MobileAdminPage from "./MOBILE/admin/AdminPage";
 import MobileAdminNoticePage from "./MOBILE/admin/AdminNoticePage";
 import MobileAdminTodayPage from "./MOBILE/admin/AdminTodayPage";
@@ -44,6 +46,7 @@ const ROUTE_MAP = [
   { path: "/test1", PC: PCTest1Page, MOBILE: MobileTest1Page },
   { path: "/notice", PC: PCTest2Page, MOBILE: MobileTest2Page },
   { path: "/content", PC: PCContentMainPage, MOBILE: MobileContentMainPage },
+  { path: "/content/:contentName/party/:id", PC: PCContentPartyPage, MOBILE: MobileContentPartyPage },
   { path: "/content/:id", PC: PCContentDetailPage, MOBILE: MobileContentDetailPage },
   { path: "/admin", PC: PCAdminPage, MOBILE: MobileAdminPage },
   { path: "/admin/notice", PC: PCAdminNoticePage, MOBILE: MobileAdminNoticePage },

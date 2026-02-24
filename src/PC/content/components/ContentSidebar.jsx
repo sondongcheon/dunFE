@@ -29,13 +29,17 @@ function ContentSidebar() {
               <div
                 className="flex-1 min-h-0 rounded-lg overflow-hidden w-full relative"
                 style={{
-                  backgroundImage: CONTENT_BG_IMAGES[key] ? `url(${CONTENT_BG_IMAGES[key]})` : undefined,
+                  backgroundImage: CONTENT_BG_IMAGES[key]
+                    ? `url(${CONTENT_BG_IMAGES[key]})`
+                    : undefined,
                   backgroundSize: "cover",
                   backgroundPosition: "center 15%",
                 }}
               >
                 <span className="absolute inset-0 bg-black/55 rounded-lg" aria-hidden />
-                <span className={`relative z-10 flex items-center px-2 py-2 text-base ${isActive ? "font-semibold text-white" : "text-gray-200 dark:text-gray-300 hover:text-white"}`}>
+                <span
+                  className={`relative z-10 flex items-center px-2 py-2 text-base ${isActive ? "font-semibold text-white" : "text-gray-200 dark:text-gray-300 hover:text-white"}`}
+                >
                   {value}
                 </span>
               </div>

@@ -316,7 +316,7 @@ function RaidFormationBlock({
             <aside className="min-w-0">
               <div className="rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-3 sticky top-4">
                 <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  캐릭터 목록
+                  캐릭터 목록 (드래그)
                 </h3>
                 <div className="space-y-3 p-2 max-h-[50vh] overflow-y-auto">
                   {sectionOrder.length === 0 && members.length === 0 ? (

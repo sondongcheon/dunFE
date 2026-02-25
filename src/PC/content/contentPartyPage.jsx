@@ -176,10 +176,7 @@ function ContentPartyPage() {
             keys.reduce((acc, k) => ({ ...acc, [k]: formationList[k].name ?? `${k + 1}공대` }), {}),
           );
           setRaidOrders(
-            keys.reduce(
-              (acc, k) => ({ ...acc, [k]: Number(formationList[k].order) || k + 1 }),
-              {},
-            ),
+            keys.reduce((acc, k) => ({ ...acc, [k]: Number(formationList[k].order) || k + 1 }), {}),
           );
           setSlotsByRaid(
             keys.reduce(
@@ -361,7 +358,7 @@ function ContentPartyPage() {
                 + 공대 추가
               </button>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                현재 {raidKeys.length}개 공대
+                현재 {raidKeys.length}개 공대, 실시간 클리어 현황 집계 안되는 중 (추가예정)
               </span>
               {savingStatus === "saving" && (
                 <span className="text-xs text-amber-600 dark:text-amber-400">저장 중…</span>

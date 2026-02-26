@@ -51,6 +51,20 @@ function RaidFormationBlock({
   const [isBlockCollapsed, setIsBlockCollapsed] = useState(false);
   const [collapsedGroups, setCollapsedGroups] = useState(() => new Set());
   const [isEditingName, setIsEditingName] = useState(false);
+  const [editDraft, setEditDraft] = useState("");
+
+  const commitRaidName = useCallback(
+    (draft) => {
+      const trimmed = (draft ?? "").trim();
+      if (trimmed === "") {
+        onRaidNameChange?.(raidLabel);
+      } else {
+        onRaidNameChange?.(trimmed);
+      }
+      setIsEditingName(false);
+    },
+    [onRaidNameChange, raidLabel],
+  );
   const toggleGroup = useCallback((key) => {
     setCollapsedGroups((prev) => {
       const next = new Set(prev);
@@ -161,12 +175,17 @@ function RaidFormationBlock({
             {onRaidNameChange && isEditingName ? (
               <input
                 type="text"
-                value={raidLabel}
-                onChange={(e) => onRaidNameChange(e.target.value)}
-                onBlur={() => setIsEditingName(false)}
+                value={editDraft}
+                onChange={(e) => setEditDraft(e.target.value)}
+                onBlur={() => commitRaidName(editDraft)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === "Escape") {
-                    e.currentTarget.blur();
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    commitRaidName(editDraft);
+                  } else if (e.key === "Escape") {
+                    e.preventDefault();
+                    setEditDraft(raidLabel);
+                    setIsEditingName(false);
                   }
                 }}
                 autoFocus
@@ -182,7 +201,10 @@ function RaidFormationBlock({
           {onRaidNameChange && (
             <button
               type="button"
-              onClick={() => setIsEditingName(true)}
+              onClick={() => {
+                setEditDraft(raidLabel);
+                setIsEditingName(true);
+              }}
               className="ml-0.5 inline-flex items-center justify-center w-7 h-7 rounded border border-gray-300 dark:border-gray-600 bg-white/70 dark:bg-gray-800/70 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-purple-400"
               title="공대 이름 수정"
             >

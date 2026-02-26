@@ -23,7 +23,7 @@ const ALLOWED_CLEAR_STATE_CONTENTS = ["azure_main", "goddess_of_death_temple"];
  * @param {Function} onRemoveCharacterFromPublicGroup - 그룹에서 캐릭터 제거 핸들러
  * @param {Function} onCreatePartyGroup - 파티 내 그룹 생성 핸들러 (partyId, groupName)
  * @param {Function} onRemovePartyGroup - 파티 그룹 삭제 핸들러 (partyGroupId)
- * @param {Function} onRemoveParty - 파티 삭제 핸들러 (partyId)
+ * @param {Function} onRemoveParty - 파티 삭제/탈퇴 핸들러 (partyId). 리더면 삭제, 아니면 탈퇴. DELETE /content/party 동일 API.
  * @param {Function} onJoinParty - 파티 참여 핸들러 (partyName, leaderNickname, password)
  * @param {Function} onMemoUpdate - 메모 수정 후 콜백 (characterId, memo)
  * @param {Function} onUpdatePartyName - 파티 이름 변경 핸들러 (partyId, name, contentName)
@@ -487,6 +487,24 @@ function Party({
                             className="text-xs text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:underline whitespace-nowrap"
                           >
                             파티 삭제
+                          </button>
+                        )}
+                        {!isMyParty && onRemoveParty && editingPartyId !== party.id && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (
+                                window.confirm(
+                                  `"${party.name}" 파티에서 탈퇴하시겠습니까?\n내 모험단만 파티에서 제거됩니다.`,
+                                )
+                              ) {
+                                onRemoveParty(party.id);
+                              }
+                            }}
+                            className="text-xs text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:underline whitespace-nowrap"
+                          >
+                            파티 탈퇴
                           </button>
                         )}
                         <span className="text-xs text-gray-500 ml-auto">

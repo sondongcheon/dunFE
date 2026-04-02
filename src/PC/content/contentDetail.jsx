@@ -66,8 +66,9 @@ function ContentDetail() {
                   <span className="text-xl text-red-500 text-gray-700 dark:text-gray-300 font-bold">
                     주의{" "}
                   </span>
-                  상급던전 클리어 기록은 API로 제공되지 않아, 드랍 기록으로 체크합니다. 그렇기
-                  때문에 레전더리 이상을 못 먹은 경우 클리어 처리가 안 됩니다.
+                  상급던전 클리어 기록 및 토별권 사용 내역은 API로 제공되지 않아, 드랍 기록으로
+                  체크합니다. <br />
+                  그렇기 때문에 레전더리 이상을 못 먹은 경우 혹은 토벌권은 클리어 처리가 안 됩니다.
                 </span>
               </p>
               <p className="pl-[1.125rem]">

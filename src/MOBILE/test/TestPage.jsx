@@ -44,10 +44,10 @@ function TestPage() {
 
   // 메인 컨텐츠 바로가기 목록
   const mainContentKeys = [
-    "venus_goddess_of_beauty",
-    "nabel",
     "inae",
     "diregie",
+    "star_turtle_grand_library",
+    "heretics_castle",
   ];
   const contentList = mainContentKeys.map((key) => [key, CONTENT_IDS[key]]);
 

@@ -1,5 +1,8 @@
 import azure_mainBg from "@/Assets/azure_main.jpg";
 import goddess_of_death_templeBg from "@/Assets/goddess_of_death_temple.jpg";
+import freed_nightmareBg from "@/Assets/freed_nightmare.jpg";
+import star_turtle_grand_libraryBg from "@/Assets/star_turtle_grand_library.jpg";
+import heretics_castleBg from "@/Assets/heretics_castle.jpg";
 import venus_goddess_of_beautyBg from "@/Assets/venus_goddess_of_beauty.jpg";
 import nabelBg from "@/Assets/nabel.jpg";
 import inaeBg from "@/Assets/inae.jpg";
@@ -11,6 +14,9 @@ import diregieBg from "@/Assets/diregie.jpg";
 export const CONTENT_BG_IMAGES = {
     azure_main: azure_mainBg,
     goddess_of_death_temple: goddess_of_death_templeBg,
+    freed_nightmare: freed_nightmareBg,
+    star_turtle_grand_library: star_turtle_grand_libraryBg,
+    heretics_castle: heretics_castleBg,
     venus_goddess_of_beauty: venus_goddess_of_beautyBg,
     nabel: nabelBg,
     inae: inaeBg,
@@ -25,6 +31,9 @@ export const CONTENT_BG_IMAGES = {
 export const CONTENT_IDS = {
     azure_main: "애쥬어 메인",
     goddess_of_death_temple: "죽음의 여신전",
+    freed_nightmare: "해방된 흉몽",
+    star_turtle_grand_library: "별거북 대서고",
+    heretics_castle: "배교자의 성",
     venus_goddess_of_beauty: "미의 여신 베누스",
     nabel: "만들어진 신, 나벨",
     inae: "이내 황혼전",

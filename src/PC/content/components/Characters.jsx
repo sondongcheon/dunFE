@@ -44,8 +44,20 @@ function getCharacterPartyGroups(character, parties) {
  * @param {string} contentName - 컨텐츠 식별자 (부연설명 노출 조건용)
  * @param {Function} onClearState - 닉네임 클릭 시 클리어 상태 갱신 (characterId) => Promise, 허용 content에서만 사용
  */
-const SHOW_CLEAR_HINT_CONTENTS = ["azure_main", "goddess_of_death_temple"];
-const ALLOWED_CLEAR_STATE_CONTENTS = ["azure_main", "goddess_of_death_temple"];
+const SHOW_CLEAR_HINT_CONTENTS = [
+  "azure_main",
+  "goddess_of_death_temple",
+  "freed_nightmare",
+  "star_turtle_grand_library",
+  "heretics_castle",
+];
+const ALLOWED_CLEAR_STATE_CONTENTS = [
+  "azure_main",
+  "goddess_of_death_temple",
+  "freed_nightmare",
+  "star_turtle_grand_library",
+  "heretics_castle",
+];
 
 function Characters({
   characters = [],

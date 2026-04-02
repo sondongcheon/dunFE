@@ -8,6 +8,9 @@ const getTeamCountByContent = (contentName) => {
   const map = {
     azure_main: 2,
     goddess_of_death_temple: 3,
+    freed_nightmare: 3,
+    star_turtle_grand_library: 3,
+    heretics_castle: 3,
     venus_goddess_of_beauty: 2,
     nabel: 1,
     inae: 2,

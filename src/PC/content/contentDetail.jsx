@@ -50,7 +50,11 @@ function ContentDetail() {
         <ContentSidebar />
         <main className="flex-1 min-w-0 space-y-6">
           <h1 className="text-2xl font-bold mt-2">{currentLabel} </h1>
-          {(id === "azure_main" || id === "goddess_of_death_temple") && (
+          {(id === "azure_main" ||
+            id === "goddess_of_death_temple" ||
+            id === "freed_nightmare" ||
+            id === "star_turtle_grand_library" ||
+            id === "heretics_castle") && (
             <div className="mt-1.5 space-y-1.5 text-sm text-gray-600 dark:text-gray-400">
               <p className="flex gap-1.5">
                 <span

@@ -3,7 +3,13 @@ import EditableMemo from "./EditableMemo";
 import { toServerIdForUrl } from "@/utils/serverMapping";
 import { CONTENT_IDS } from "../constants";
 
-const ALLOWED_CLEAR_STATE_CONTENTS = ["azure_main", "goddess_of_death_temple"];
+const ALLOWED_CLEAR_STATE_CONTENTS = [
+  "azure_main",
+  "goddess_of_death_temple",
+  "freed_nightmare",
+  "star_turtle_grand_library",
+  "heretics_castle",
+];
 
 /**
  * Group 컴포넌트

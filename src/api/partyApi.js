@@ -281,7 +281,6 @@ export async function getPartyFormationPage(contentName, partyId, adventureId = 
             adventureId: Number(adventureId) || 1,
         },
     });
-    console.log(response.data);
     return response.data || {};
 }
 

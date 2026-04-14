@@ -33,6 +33,7 @@ export const AUTH_ENDPOINTS = {
     LOGOUT: "/adventure/logout",
     REISSUE: "/adventure/reissue",
     ME: "/adventure/me", // 현재 로그인한 사용자 정보 확인 (인증 상태 검증용)
+    MEMO_UPDATE: "/adventure/memoUpdate",
 };
 
 // User 관련 엔드포인트 (예시)

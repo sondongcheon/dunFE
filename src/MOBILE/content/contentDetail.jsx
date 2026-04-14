@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import Characters from "@/PC/content/components/Characters";
 import Group from "@/PC/content/components/Group";
@@ -14,6 +14,7 @@ import useContentDetail from "@/PC/content/useContentDetail";
 function MobileContentDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [showRecommendedFameOnly, setShowRecommendedFameOnly] = useState(true);
   const {
     invalid,
     currentLabel,
@@ -88,7 +89,34 @@ function MobileContentDetail() {
       </header>
 
       <main className="pt-4 space-y-6">
-<Characters
+        {(id === "azure_main" ||
+          id === "goddess_of_death_temple" ||
+          id === "freed_nightmare") && (
+          <div className="px-2">
+            <button
+              type="button"
+              onClick={() => setShowRecommendedFameOnly((prev) => !prev)}
+              className="inline-flex items-center gap-2 select-none"
+              aria-pressed={showRecommendedFameOnly}
+            >
+              <span
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  showRecommendedFameOnly ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                    showRecommendedFameOnly ? "translate-x-5" : "translate-x-1"
+                  }`}
+                />
+              </span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                명성 초과 캐릭터 숨기기 ( 적정 상급던전이 아닌 경우 )
+              </span>
+            </button>
+          </div>
+        )}
+        <Characters
         characters={characters}
         groups={groups}
         parties={parties}
@@ -96,6 +124,8 @@ function MobileContentDetail() {
         addedCharacterIds={addedCharacterIds}
         onMemoUpdate={handlers.handleMemoUpdate}
         canEditMemo={isLoggedIn}
+        contentName={id}
+        showRecommendedFameOnly={showRecommendedFameOnly}
       />
         <Group
           groups={groups}

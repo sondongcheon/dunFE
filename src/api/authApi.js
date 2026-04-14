@@ -107,3 +107,16 @@ export async function verifyAuth() {
         return null;
     }
 }
+
+/**
+ * 던담 기반 캐릭터 동기화 + 메모(딜량) 갱신
+ * GET /adventure/memoUpdate?adventureName=...
+ * @param {string} adventureName - 현재 로그인된 모험단명
+ * @returns {Promise<any>} 서버 응답 데이터
+ */
+export async function memoUpdateByAdventureName(adventureName) {
+    const response = await apiClient.get(AUTH_ENDPOINTS.MEMO_UPDATE, {
+        params: { adventureName },
+    });
+    return response.data;
+}

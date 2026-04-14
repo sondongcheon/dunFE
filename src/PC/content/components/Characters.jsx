@@ -58,6 +58,11 @@ const ALLOWED_CLEAR_STATE_CONTENTS = [
   "star_turtle_grand_library",
   "heretics_castle",
 ];
+const MAX_FAME_BY_CONTENT = {
+  azure_main: 71179,
+  goddess_of_death_temple: 91581,
+  freed_nightmare: 101852,
+};
 
 function Characters({
   characters = [],
@@ -69,6 +74,7 @@ function Characters({
   onClearState,
   canEditMemo = false,
   contentName,
+  showRecommendedFameOnly = false,
   /** true면 섹션 제목·필터 없이 그리드만 렌더 (공대편성 슬롯 등) */
   hideHeader = false,
 }) {
@@ -77,10 +83,18 @@ function Characters({
   const [clearingCharacterId, setClearingCharacterId] = useState(null);
 
   const displayCharacters = useMemo(() => {
-    if (!addedCharacterIds || addedCharacterIds.size === 0) return characters;
-    if (filterMode === "include") return characters;
-    return characters.filter((c) => !addedCharacterIds.has(c.id));
-  }, [characters, addedCharacterIds, filterMode]);
+    const maxFame = MAX_FAME_BY_CONTENT[contentName];
+    const fameFiltered = showRecommendedFameOnly && typeof maxFame === "number"
+      ? characters.filter((character) => {
+          const fame = Number(character.value ?? character.fame ?? 0);
+          return Number.isFinite(fame) && fame <= maxFame;
+        })
+      : characters;
+
+    if (!addedCharacterIds || addedCharacterIds.size === 0) return fameFiltered;
+    if (filterMode === "include") return fameFiltered;
+    return fameFiltered.filter((c) => !addedCharacterIds.has(c.id));
+  }, [characters, addedCharacterIds, filterMode, showRecommendedFameOnly, contentName]);
 
   const renderCard = (character) => (
     <div

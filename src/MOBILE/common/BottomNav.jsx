@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "@/store/settingsSlice";
 import LoginModal from "@/PC/common/LoginModal";
 import CharacterAddModal from "@/PC/common/CharacterAddModal";
-import { verifyAuth } from "@/api/authApi";
+import { memoUpdateByAdventureName, verifyAuth } from "@/api/authApi";
 import {
   Dialog,
   DialogContent,
@@ -27,8 +27,12 @@ function BottomNav() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showCharacterAddModal, setShowCharacterAddModal] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showMemoUpdateConfirm, setShowMemoUpdateConfirm] = useState(false);
+  const [showMemoUpdateResult, setShowMemoUpdateResult] = useState(false);
+  const [memoUpdateResultMessage, setMemoUpdateResultMessage] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adventureName, setAdventureName] = useState("");
+  const [isMemoUpdating, setIsMemoUpdating] = useState(false);
 
   // 페이지 로드 시: localStorage 또는 쿠키(토큰) 기준으로 로그인 상태 확인
   useEffect(() => {
@@ -82,6 +86,20 @@ function BottomNav() {
     setIsLoggedIn(false);
     setAdventureName("");
     setShowLogoutConfirm(false);
+  };
+
+  const handleMemoUpdate = async () => {
+    if (!adventureName) return;
+    setIsMemoUpdating(true);
+    try {
+      const response = await memoUpdateByAdventureName(adventureName);
+      setMemoUpdateResultMessage(response?.message ?? "최신화가 완료되었습니다.");
+      setShowMemoUpdateConfirm(false);
+      setShowMore(false);
+      setShowMemoUpdateResult(true);
+    } finally {
+      setIsMemoUpdating(false);
+    }
   };
 
   return (
@@ -195,6 +213,61 @@ function BottomNav() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={showMemoUpdateConfirm} onOpenChange={setShowMemoUpdateConfirm}>
+        <DialogContent className="max-w-[320px] rounded-xl gap-4 p-5 dark:bg-gray-800 dark:border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-base font-semibold text-gray-900 dark:text-white">
+              던담 정보로 최신화 하기
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
+            {
+              "던담에 등록된 정보를 가져와(모험단 명 검색 기준)\n 캐릭터 추가 및 메모칸을 내 딜량으로 갱신합니다.\n갱신은 1시간마다 1번 가능합니다. (던담에 악성 요청 방지)\n\n실행하시겠습니까 ?"
+            }
+          </p>
+          <DialogFooter className="flex gap-2 justify-end sm:justify-end">
+            <button
+              type="button"
+              onClick={() => setShowMemoUpdateConfirm(false)}
+              disabled={isMemoUpdating}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              onClick={handleMemoUpdate}
+              disabled={isMemoUpdating}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 disabled:opacity-50"
+            >
+              {isMemoUpdating ? "요청 중...(약 10초 소요)" : "실행"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showMemoUpdateResult} onOpenChange={setShowMemoUpdateResult}>
+        <DialogContent className="max-w-[320px] rounded-xl gap-4 p-5 dark:bg-gray-800 dark:border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-base font-semibold text-gray-900 dark:text-white">
+              최신화 결과
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
+            {memoUpdateResultMessage}
+          </p>
+          <DialogFooter className="flex gap-2 justify-end sm:justify-end">
+            <button
+              type="button"
+              onClick={() => setShowMemoUpdateResult(false)}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500"
+            >
+              확인
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* 더보기 팝오버 */}
       {showMore && (
         <>
@@ -242,6 +315,16 @@ function BottomNav() {
                 <span>테마</span>
                 <span>{darkMode ? "🌞 라이트" : "🌙 다크"}</span>
               </button>
+              {isLoggedIn && (
+                <button
+                  type="button"
+                  onClick={() => setShowMemoUpdateConfirm(true)}
+                  className="w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
+                >
+                  <span>최신화 하기</span>
+                  <span aria-hidden>🔄</span>
+                </button>
+              )}
             </div>
           </div>
         </>

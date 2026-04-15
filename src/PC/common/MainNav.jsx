@@ -127,7 +127,7 @@ function MainNav() {
                 <button
                   type="button"
                   onClick={() => setShowMemoUpdateConfirm(true)}
-                  className="px-2.5 py-1.5 text-sm font-medium text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-600 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors whitespace-nowrap"
+                  className="hidden px-2.5 py-1.5 text-sm font-medium text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-600 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors whitespace-nowrap"
                 >
                   던담 정보로 캐릭터 / 딜량 메모 최신화 하기
                 </button>

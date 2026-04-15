@@ -319,7 +319,7 @@ function BottomNav() {
                 <button
                   type="button"
                   onClick={() => setShowMemoUpdateConfirm(true)}
-                  className="w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
+                  className="hidden w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
                 >
                   <span>최신화 하기</span>
                   <span aria-hidden>🔄</span>

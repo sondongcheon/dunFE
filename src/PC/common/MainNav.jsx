@@ -5,17 +5,25 @@ import { toggleDarkMode } from "@/store/settingsSlice";
 import LoginModal from "./LoginModal";
 import CharacterAddModal from "./CharacterAddModal";
 import { CONTENT_IDS, CONTENT_BG_IMAGES } from "@/PC/content/constants";
-import { memoUpdateByAdventureName, verifyAuth } from "@/api/authApi";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { verifyAuth } from "@/api/authApi";
+
+/** 모험단 정보 — 네비 호버 서브메뉴 (PC) */
+const MY_INFO_NAV_SUBMENU = [
+  { label: "내 정보 조회하기", path: "/my-info/me" },
+  { label: "다른사람 정보 조회하기", path: "/my-info/other" },
+];
+
+const LAB_HOVER_KEY = "__lab__";
+const LAB_SUBMENU = [{ label: "던담 정보로 딜량 갱신하기", path: "/infoupdate" }];
 
 const NAV_ITEMS = [
   { path: "/", label: "홈" },
+  {
+    path: "/my-info/me",
+    label: "모험단 정보",
+    matchPrefix: "/my-info",
+    submenu: MY_INFO_NAV_SUBMENU,
+  },
   { path: "/content", label: "컨텐츠", hasSubmenu: true },
   { path: "/notice", label: "공지사항" },
   { path: "/comments", label: "유저 코멘트" },
@@ -29,10 +37,6 @@ function MainNav() {
   const [hoveredNav, setHoveredNav] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adventureName, setAdventureName] = useState("");
-  const [showMemoUpdateConfirm, setShowMemoUpdateConfirm] = useState(false);
-  const [showMemoUpdateResult, setShowMemoUpdateResult] = useState(false);
-  const [memoUpdateResultMessage, setMemoUpdateResultMessage] = useState("");
-  const [isMemoUpdating, setIsMemoUpdating] = useState(false);
 
   // 페이지 로드 시: localStorage 또는 쿠키(토큰) 기준으로 로그인 상태 확인
   useEffect(() => {
@@ -87,19 +91,6 @@ function MainNav() {
     setAdventureName("");
   };
 
-  const handleMemoUpdate = async () => {
-    if (!adventureName) return;
-    setIsMemoUpdating(true);
-    try {
-      const response = await memoUpdateByAdventureName(adventureName);
-      setMemoUpdateResultMessage(response?.message ?? "최신화가 완료되었습니다.");
-      setShowMemoUpdateConfirm(false);
-      setShowMemoUpdateResult(true);
-    } finally {
-      setIsMemoUpdating(false);
-    }
-  };
-
   return (
     <div className="fixed top-0 left-0 w-full z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
       {/* 첫 번째 줄: 로고 + 버튼들 */}
@@ -118,18 +109,19 @@ function MainNav() {
             <CharacterAddModal />
             {isLoggedIn ? (
               <div className="flex items-center gap-2">
-                <div className="text-xs text-center text-gray-700 dark:text-gray-300 min-w-[120px] max-w-[180px] truncate">
-                  <p>로그인 모험단</p>
-                  <span className="text-sm" title={adventureName}>
-                    {adventureName}
-                  </span>
-                </div>
                 <button
                   type="button"
-                  onClick={() => setShowMemoUpdateConfirm(true)}
-                  className="hidden px-2.5 py-1.5 text-sm font-medium text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-600 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors whitespace-nowrap"
+                  onClick={() => navigate("/my-info/me")}
+                  className="text-xs text-center text-gray-700 dark:text-gray-300 min-w-[120px] max-w-[180px] truncate rounded-md px-1 py-0.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  title="모험단 정보 보기로 이동"
                 >
-                  던담 정보로 캐릭터 / 딜량 메모 최신화 하기
+                  <p className="pointer-events-none">로그인 모험단</p>
+                  <span
+                    className="text-sm block truncate pointer-events-none"
+                    title={adventureName}
+                  >
+                    {adventureName}
+                  </span>
                 </button>
                 <button
                   onClick={handleLogout}
@@ -157,7 +149,9 @@ function MainNav() {
         <nav className="relative">
           <ul className="flex items-center gap-8 h-12">
             {NAV_ITEMS.map((item) => {
-              const isActive = location.pathname === item.path;
+              const isActive = item.matchPrefix
+                ? location.pathname.startsWith(item.matchPrefix)
+                : location.pathname === item.path;
               return (
                 <li
                   key={item.path}
@@ -227,6 +221,25 @@ function MainNav() {
                             </div>
                           ))}
                         </nav>
+                      ) : item.submenu ? (
+                        <nav className="py-1" aria-label="모험단 정보 하위 메뉴">
+                          <div className="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                            모험단 정보
+                          </div>
+                          {item.submenu.map((link) => (
+                            <button
+                              key={link.path}
+                              type="button"
+                              onClick={() => {
+                                navigate(link.path);
+                                setHoveredNav(null);
+                              }}
+                              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            >
+                              {link.label}
+                            </button>
+                          ))}
+                        </nav>
                       ) : (
                         <>
                           <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
@@ -245,64 +258,53 @@ function MainNav() {
                 </li>
               );
             })}
+            <li
+              key={LAB_HOVER_KEY}
+              className="relative ml-auto"
+              onMouseEnter={() => setHoveredNav(LAB_HOVER_KEY)}
+              onMouseLeave={() => setHoveredNav(null)}
+            >
+              <button
+                type="button"
+                onClick={() => navigate("/infoupdate")}
+                className={`px-3 py-2 text-sm font-medium transition-colors ${
+                  location.pathname.startsWith("/infoupdate")
+                    ? "text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                }`}
+              >
+                실험실
+              </button>
+              {hoveredNav === LAB_HOVER_KEY && (
+                <div
+                  className="absolute top-full right-0 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2 z-50"
+                  onMouseEnter={() => setHoveredNav(LAB_HOVER_KEY)}
+                  onMouseLeave={() => setHoveredNav(null)}
+                >
+                  <nav className="py-1" aria-label="실험실 하위 메뉴">
+                    <div className="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                      실험실
+                    </div>
+                    {LAB_SUBMENU.map((link) => (
+                      <button
+                        key={link.path}
+                        type="button"
+                        onClick={() => {
+                          navigate(link.path);
+                          setHoveredNav(null);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        {link.label}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+              )}
+            </li>
           </ul>
         </nav>
       </div>
-
-      <Dialog open={showMemoUpdateConfirm} onOpenChange={setShowMemoUpdateConfirm}>
-        <DialogContent className="max-w-[420px] rounded-xl gap-4 p-5 dark:bg-gray-800 dark:border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="text-base font-semibold text-gray-900 dark:text-white">
-              던담 정보로 최신화 하기
-            </DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
-            {
-              "던담에 등록된 정보를 가져와(모험단 명 검색 기준)\n 캐릭터 추가 및 메모칸을 내 딜량으로 갱신합니다.\n\n갱신은 1시간마다 1번 가능합니다. (던담에 악성 요청 방지)\n\n실행하시겠습니까 ?"
-            }
-          </p>
-          <DialogFooter className="flex gap-2 justify-end sm:justify-end">
-            <button
-              type="button"
-              onClick={() => setShowMemoUpdateConfirm(false)}
-              disabled={isMemoUpdating}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-            >
-              취소
-            </button>
-            <button
-              type="button"
-              onClick={handleMemoUpdate}
-              disabled={isMemoUpdating}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 disabled:opacity-50"
-            >
-              {isMemoUpdating ? "요청 중... (약 10초 소요)" : "실행"}
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showMemoUpdateResult} onOpenChange={setShowMemoUpdateResult}>
-        <DialogContent className="max-w-[420px] rounded-xl gap-4 p-5 dark:bg-gray-800 dark:border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="text-base font-semibold text-gray-900 dark:text-white">
-              최신화 결과
-            </DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
-            {memoUpdateResultMessage}
-          </p>
-          <DialogFooter className="flex gap-2 justify-end sm:justify-end">
-            <button
-              type="button"
-              onClick={() => setShowMemoUpdateResult(false)}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500"
-            >
-              확인
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

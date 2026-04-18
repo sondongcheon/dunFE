@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "@/store/settingsSlice";
 import LoginModal from "@/PC/common/LoginModal";
 import CharacterAddModal from "@/PC/common/CharacterAddModal";
-import { memoUpdateByAdventureName, verifyAuth } from "@/api/authApi";
+import { verifyAuth } from "@/api/authApi";
 import {
   Dialog,
   DialogContent,
@@ -24,15 +24,12 @@ function BottomNav() {
   const dispatch = useDispatch();
   const darkMode = useSelector((state) => state.settings.darkMode);
   const [showMore, setShowMore] = useState(false);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showCharacterAddModal, setShowCharacterAddModal] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [showMemoUpdateConfirm, setShowMemoUpdateConfirm] = useState(false);
-  const [showMemoUpdateResult, setShowMemoUpdateResult] = useState(false);
-  const [memoUpdateResultMessage, setMemoUpdateResultMessage] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adventureName, setAdventureName] = useState("");
-  const [isMemoUpdating, setIsMemoUpdating] = useState(false);
 
   // 페이지 로드 시: localStorage 또는 쿠키(토큰) 기준으로 로그인 상태 확인
   useEffect(() => {
@@ -88,20 +85,6 @@ function BottomNav() {
     setShowLogoutConfirm(false);
   };
 
-  const handleMemoUpdate = async () => {
-    if (!adventureName) return;
-    setIsMemoUpdating(true);
-    try {
-      const response = await memoUpdateByAdventureName(adventureName);
-      setMemoUpdateResultMessage(response?.message ?? "최신화가 완료되었습니다.");
-      setShowMemoUpdateConfirm(false);
-      setShowMore(false);
-      setShowMemoUpdateResult(true);
-    } finally {
-      setIsMemoUpdating(false);
-    }
-  };
-
   return (
     <>
       <nav
@@ -143,13 +126,18 @@ function BottomNav() {
           {isLoggedIn ? (
             <button
               type="button"
-              onClick={() => setShowLogoutConfirm(true)}
+              onClick={() => {
+                setShowMore(false);
+                setShowAccountMenu((v) => !v);
+              }}
               className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 text-gray-500 dark:text-gray-400 transition-colors active:scale-95"
               title={adventureName}
+              aria-expanded={showAccountMenu}
+              aria-haspopup="true"
             >
               <span className="text-xl leading-none">👤</span>
               <span className="text-[10px] font-medium truncate max-w-[3rem]" title={adventureName}>
-                {adventureName || "로그아웃"}
+                계정
               </span>
             </button>
           ) : (
@@ -165,7 +153,10 @@ function BottomNav() {
 
           <button
             type="button"
-            onClick={() => setShowMore(!showMore)}
+            onClick={() => {
+              setShowAccountMenu(false);
+              setShowMore(!showMore);
+            }}
             className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 text-gray-500 dark:text-gray-400 transition-colors active:scale-95"
           >
             <span className="text-xl leading-none">⚙️</span>
@@ -213,60 +204,66 @@ function BottomNav() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showMemoUpdateConfirm} onOpenChange={setShowMemoUpdateConfirm}>
-        <DialogContent className="max-w-[320px] rounded-xl gap-4 p-5 dark:bg-gray-800 dark:border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="text-base font-semibold text-gray-900 dark:text-white">
-              던담 정보로 최신화 하기
-            </DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
-            {
-              "던담에 등록된 정보를 가져와(모험단 명 검색 기준)\n 캐릭터 추가 및 메모칸을 내 딜량으로 갱신합니다.\n갱신은 1시간마다 1번 가능합니다. (던담에 악성 요청 방지)\n\n실행하시겠습니까 ?"
-            }
-          </p>
-          <DialogFooter className="flex gap-2 justify-end sm:justify-end">
-            <button
-              type="button"
-              onClick={() => setShowMemoUpdateConfirm(false)}
-              disabled={isMemoUpdating}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-            >
-              취소
-            </button>
-            <button
-              type="button"
-              onClick={handleMemoUpdate}
-              disabled={isMemoUpdating}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 disabled:opacity-50"
-            >
-              {isMemoUpdating ? "요청 중...(약 10초 소요)" : "실행"}
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showMemoUpdateResult} onOpenChange={setShowMemoUpdateResult}>
-        <DialogContent className="max-w-[320px] rounded-xl gap-4 p-5 dark:bg-gray-800 dark:border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="text-base font-semibold text-gray-900 dark:text-white">
-              최신화 결과
-            </DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
-            {memoUpdateResultMessage}
-          </p>
-          <DialogFooter className="flex gap-2 justify-end sm:justify-end">
-            <button
-              type="button"
-              onClick={() => setShowMemoUpdateResult(false)}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500"
-            >
-              확인
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* 계정 메뉴 (내 정보 / 로그아웃) */}
+      {showAccountMenu && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setShowAccountMenu(false)}
+            aria-hidden="true"
+          />
+          <div
+            className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-4 right-4 max-w-[480px] mx-auto z-50 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+            role="dialog"
+            aria-label="계정 메뉴"
+          >
+            <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+              <p className="text-xs text-gray-500 dark:text-gray-400">로그인 모험단</p>
+              <p
+                className="text-sm font-medium text-gray-900 dark:text-white truncate"
+                title={adventureName}
+              >
+                {adventureName}
+              </p>
+            </div>
+            <div className="p-4 space-y-2">
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/my-info/me");
+                  setShowAccountMenu(false);
+                }}
+                className="w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
+              >
+                <span>내 정보 조회하기</span>
+                <span aria-hidden>👤</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/my-info/other");
+                  setShowAccountMenu(false);
+                }}
+                className="w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
+              >
+                <span>다른사람 정보 조회하기</span>
+                <span aria-hidden>🔎</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAccountMenu(false);
+                  setShowLogoutConfirm(true);
+                }}
+                className="w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
+              >
+                <span>로그아웃</span>
+                <span aria-hidden>🚪</span>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* 더보기 팝오버 */}
       {showMore && (
@@ -316,14 +313,22 @@ function BottomNav() {
                 <span>{darkMode ? "🌞 라이트" : "🌙 다크"}</span>
               </button>
               {isLoggedIn && (
-                <button
-                  type="button"
-                  onClick={() => setShowMemoUpdateConfirm(true)}
-                  className="hidden w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
-                >
-                  <span>최신화 하기</span>
-                  <span aria-hidden>🔄</span>
-                </button>
+                <>
+                  <div className="px-3 pt-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                    실험실
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigate("/infoupdate");
+                      setShowMore(false);
+                    }}
+                    className="w-full flex items-center justify-between py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-3 -mx-1"
+                  >
+                    <span>던담 정보로 딜량 갱신하기</span>
+                    <span aria-hidden>🔄</span>
+                  </button>
+                </>
               )}
             </div>
           </div>

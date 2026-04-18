@@ -34,7 +34,16 @@ export const AUTH_ENDPOINTS = {
     REISSUE: "/adventure/reissue",
     ME: "/adventure/me", // 현재 로그인한 사용자 정보 확인 (인증 상태 검증용)
     MEMO_UPDATE: "/adventure/memoUpdate",
+    /** POST body: { html } — 던담 등에서 복사한 검색 결과 HTML */
+    MEMO_UPDATE_HTML: "/adventure/memoUpdate/html",
+    /** POST 쿼리 password — 관리자 게이트 검증 (서버에서만 비밀번호 판별) */
+    ADMIN_TEST_PASS: "/adventure/test/pass",
 };
+
+/** 모험단 단위 조회 (내 정보 등) */
+export const ADVENTURE_ENDPOINTS = Object.freeze({
+    MY_INFO: "/adventure/my-info",
+});
 
 // User 관련 엔드포인트 (예시)
 // export const USER_ENDPOINTS = {

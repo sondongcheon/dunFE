@@ -71,6 +71,8 @@ export async function fetchContentData(contentName) {
             clearState: typeof item.clearState === "boolean" ? item.clearState : false,
             image: item.img || item.image || null,
             server: item.server || null,
+            setEquip: item.setEquip ?? null,
+            setOath: item.setOath ?? null,
         }));
 
         return {

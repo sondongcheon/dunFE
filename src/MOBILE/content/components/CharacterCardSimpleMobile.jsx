@@ -28,7 +28,7 @@ function CharacterCardSimpleMobile({
       }`}
     >
       {/* 1행: 닉네임 + 버튼(던담이동) */}
-      <div className="flex items-center justify-between gap-2 px-2 py-1.5 border-b border-amber-200/50 dark:border-amber-800/50 min-w-0">
+      <div className="flex items-center justify-between gap-[0.6rem] px-[0.6rem] py-[0.45rem] border-b border-amber-200/50 dark:border-amber-800/50 min-w-0">
         <p
           className={`font-semibold text-gray-900 dark:text-white truncate min-w-0 ${
             dense ? "text-xs" : "text-sm"

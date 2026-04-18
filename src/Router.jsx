@@ -23,6 +23,10 @@ import MobileAdminPage from "./MOBILE/admin/AdminPage";
 import MobileAdminNoticePage from "./MOBILE/admin/AdminNoticePage";
 import MobileAdminTodayPage from "./MOBILE/admin/AdminTodayPage";
 import MobileCommentsPage from "./MOBILE/comments/CommentsPage";
+import PCMyInfoPage from "@/PC/myInfo/myInfoPage";
+import MobileMyInfoPage from "@/MOBILE/myInfo/myInfoPage";
+import PCInfoUpdatePage from "@/PC/infoupdate/InfoUpdatePage";
+import MobileInfoUpdatePage from "@/MOBILE/infoupdate/InfoUpdatePage";
 
 // PC 헤더 / 모바일 하단 Nav
 import PCMainNav from "./PC/common/MainNav";
@@ -43,6 +47,7 @@ const isMobileDomain = () => {
 // 경로별 PC · MOBILE 컴포넌트 매핑 (추가 페이지는 여기만 확장)
 const ROUTE_MAP = [
   { path: "/", PC: PCTestPage, MOBILE: MobileTestPage },
+  { path: "/my-info/*", PC: PCMyInfoPage, MOBILE: MobileMyInfoPage },
   { path: "/test1", PC: PCTest1Page, MOBILE: MobileTest1Page },
   { path: "/notice", PC: PCTest2Page, MOBILE: MobileTest2Page },
   { path: "/content", PC: PCContentMainPage, MOBILE: MobileContentMainPage },
@@ -52,6 +57,7 @@ const ROUTE_MAP = [
   { path: "/admin/notice", PC: PCAdminNoticePage, MOBILE: MobileAdminNoticePage },
   { path: "/admin/today", PC: PCAdminTodayPage, MOBILE: MobileAdminTodayPage },
   { path: "/comments", PC: PCCommentsPage, MOBILE: MobileCommentsPage },
+  { path: "/infoupdate", PC: PCInfoUpdatePage, MOBILE: MobileInfoUpdatePage },
 ];
 
 function Router() {

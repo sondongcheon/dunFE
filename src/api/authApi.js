@@ -108,15 +108,49 @@ export async function verifyAuth() {
     }
 }
 
+/** 던담 최신화(memoUpdate) 전용 — 서버 처리가 길 수 있어 공용 10초보다 길게 둠 */
+const MEMO_UPDATE_TIMEOUT_MS = 300_000;
+
 /**
  * 던담 기반 캐릭터 동기화 + 메모(딜량) 갱신
- * GET /adventure/memoUpdate?adventureName=...
+ * GET /adventure/memoUpdate?adventureName=...&check=...
  * @param {string} adventureName - 현재 로그인된 모험단명
+ * @param {boolean} check - 캐릭터 순회 갱신 등 서버 옵션
  * @returns {Promise<any>} 서버 응답 데이터
  */
-export async function memoUpdateByAdventureName(adventureName) {
+export async function memoUpdateByAdventureName(adventureName, check) {
     const response = await apiClient.get(AUTH_ENDPOINTS.MEMO_UPDATE, {
-        params: { adventureName },
+        params: { adventureName, check },
+        timeout: MEMO_UPDATE_TIMEOUT_MS,
     });
     return response.data;
+}
+
+/**
+ * 던담 HTML 일부/전체로 메모 등 갱신
+ * POST /adventure/memoUpdate/html — MemoUpdateFromHtmlReq { html }
+ * @param {string} html
+ * @returns {Promise<any>}
+ */
+export async function memoUpdateFromHtml(html) {
+    const response = await apiClient.post(
+        AUTH_ENDPOINTS.MEMO_UPDATE_HTML,
+        { html },
+        { _skipErrorAlert: true },
+    );
+    return response.data;
+}
+
+/**
+ * 관리자 게이트 비밀번호 서버 검증
+ * POST /adventure/test/pass?password=...
+ * @param {string} password
+ * @returns {Promise<boolean>} 서버가 true일 때만 통과
+ */
+export async function verifyAdminGatePassword(password) {
+    const response = await apiClient.post(AUTH_ENDPOINTS.ADMIN_TEST_PASS, null, {
+        params: { password },
+        _skipErrorAlert: true,
+    });
+    return response.data === true;
 }

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import EditableMemo from "./EditableMemo";
+import CharacterSetEquipOathRows from "./CharacterSetEquipOathRows";
 import { toServerIdForUrl } from "@/utils/serverMapping";
 import { CONTENT_IDS } from "../constants";
 
@@ -21,7 +22,7 @@ function getCharacterPartyGroups(character, parties) {
           m.id === charId ||
           m.characterId === charCharacterId ||
           m.id === charCharacterId ||
-          m.characterId === charId
+          m.characterId === charId,
       );
       if (inGroup) {
         list.push({ partyName: party.name ?? "", groupName: group.name ?? "" });
@@ -84,12 +85,13 @@ function Characters({
 
   const displayCharacters = useMemo(() => {
     const maxFame = MAX_FAME_BY_CONTENT[contentName];
-    const fameFiltered = showRecommendedFameOnly && typeof maxFame === "number"
-      ? characters.filter((character) => {
-          const fame = Number(character.value ?? character.fame ?? 0);
-          return Number.isFinite(fame) && fame <= maxFame;
-        })
-      : characters;
+    const fameFiltered =
+      showRecommendedFameOnly && typeof maxFame === "number"
+        ? characters.filter((character) => {
+            const fame = Number(character.value ?? character.fame ?? 0);
+            return Number.isFinite(fame) && fame <= maxFame;
+          })
+        : characters;
 
     if (!addedCharacterIds || addedCharacterIds.size === 0) return fameFiltered;
     if (filterMode === "include") return fameFiltered;
@@ -98,13 +100,13 @@ function Characters({
 
   const renderCard = (character) => (
     <div
-      key={character.id}
-      className={`relative flex gap-4 p-4 rounded-xl shadow-sm transition-all duration-200 min-w-0 ${
+      className={`relative flex flex-col gap-0 overflow-hidden p-3 rounded-xl shadow-sm transition-all duration-200 min-w-0 min-h-[12.45rem] ${
         character.clearState
           ? "bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-600 hover:shadow-md hover:border-green-400 dark:hover:border-green-500"
           : "bg-amber-50/80 dark:bg-amber-900/15 border-2 border-amber-200 dark:border-amber-800 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700"
       }`}
     >
+      <div className="flex gap-4 flex-1 min-w-0 min-h-0">
       <div className="flex flex-col items-center flex-shrink-0">
         <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 ring-2 ring-gray-100 dark:ring-gray-600">
           <span className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl font-bold text-gray-500 dark:text-gray-400">
@@ -149,7 +151,7 @@ function Characters({
                 if (clearingCharacterId !== null) return;
                 const contentLabel = CONTENT_IDS[contentName] ?? contentName;
                 const confirmed = window.confirm(
-                  `"${character.name}" 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`
+                  `"${character.name}" 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`,
                 );
                 if (!confirmed) return;
                 setClearingCharacterId(character.id);
@@ -176,10 +178,12 @@ function Characters({
             <span
               className="text-xs px-2 py-0.5 rounded-md font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 truncate max-w-[8rem]"
               title={
-                groups.find((g) => g.id === character.groupNum)?.name ?? `그룹 ${character.groupNum}`
+                groups.find((g) => g.id === character.groupNum)?.name ??
+                `그룹 ${character.groupNum}`
               }
             >
-              {groups.find((g) => g.id === character.groupNum)?.name ?? `그룹 ${character.groupNum}`}
+              {groups.find((g) => g.id === character.groupNum)?.name ??
+                `그룹 ${character.groupNum}`}
             </span>
           </div>
         )}
@@ -215,6 +219,13 @@ function Characters({
           />
         </div>
       </div>
+      </div>
+
+      <CharacterSetEquipOathRows
+        setEquip={character.setEquip}
+        setOath={character.setOath}
+        clearState={character.clearState}
+      />
     </div>
   );
 
@@ -222,7 +233,9 @@ function Characters({
     if (loading || !characters.length) return null;
     return (
       <div className="grid gap-3 grid-cols-1 min-w-0 w-full">
-        {characters.map((character) => renderCard(character))}
+        {characters.map((character) => (
+          <React.Fragment key={character.id}>{renderCard(character)}</React.Fragment>
+        ))}
       </div>
     );
   }
@@ -334,7 +347,9 @@ function Characters({
                 : "캐릭터가 없습니다."}
             </div>
           ) : (
-            displayCharacters.map((character) => renderCard(character))
+            displayCharacters.map((character) => (
+              <React.Fragment key={character.id}>{renderCard(character)}</React.Fragment>
+            ))
           )}
         </div>
       )}

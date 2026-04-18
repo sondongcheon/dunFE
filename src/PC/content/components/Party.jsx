@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import EditableMemo from "./EditableMemo";
+import CharacterSetEquipOathRows from "./CharacterSetEquipOathRows";
 import { toServerIdForUrl } from "@/utils/serverMapping";
 import { CONTENT_IDS } from "../constants";
 
@@ -845,6 +846,10 @@ function Party({
                                                           : charFromList?.clearState;
                                                       const displayMemo =
                                                         member.memo ?? charFromList?.memo ?? null;
+                                                      const displaySetEquip =
+                                                        member.setEquip ?? charFromList?.setEquip;
+                                                      const displaySetOath =
+                                                        member.setOath ?? charFromList?.setOath;
                                                       const displayImage =
                                                         member.img ??
                                                         member.image ??
@@ -860,170 +865,183 @@ function Party({
                                                             neopleCharacterId ??
                                                             `member-${members.indexOf(member)}`
                                                           }
-                                                          className={`relative flex gap-4 p-4 rounded-xl shadow-sm transition-all duration-200 ${
+                                                          className={`relative flex flex-col gap-0 overflow-hidden p-3 rounded-xl shadow-sm transition-all duration-200 min-h-[12.45rem] ${
                                                             isClear
                                                               ? "bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-600 hover:shadow-md hover:border-green-400 dark:hover:border-green-500"
                                                               : "bg-amber-50/80 dark:bg-amber-900/15 border-2 border-amber-200 dark:border-amber-800 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700"
                                                           }`}
                                                         >
-                                                          <div className="flex flex-col items-center flex-shrink-0">
-                                                            <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 ring-2 ring-gray-100 dark:ring-gray-600">
-                                                              <span className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl font-bold text-gray-500 dark:text-gray-400">
-                                                                {(member.nickname ?? "").charAt(
-                                                                  0,
-                                                                ) || "?"}
-                                                              </span>
-                                                              {displayImage && (
-                                                                <img
-                                                                  src={displayImage}
-                                                                  alt={member.nickname ?? ""}
-                                                                  className="relative w-full h-full object-cover object-[center_100%] scale-125"
-                                                                  onError={(e) => {
-                                                                    e.target.style.display = "none";
-                                                                  }}
-                                                                />
-                                                              )}
-                                                            </div>
-                                                            {(member.job || charFromList?.job) && (
-                                                              <span className="text-xs font-bold text-gray-900 dark:text-white mt-2 text-center truncate max-w-[5rem] sm:max-w-[5.5rem]">
-                                                                {member.job ?? charFromList?.job}
-                                                              </span>
-                                                            )}
-                                                            <div className="mt-2 flex items-center justify-center gap-1 flex-wrap">
-                                                              <button
-                                                                type="button"
-                                                                onClick={(e) => {
-                                                                  e.stopPropagation();
-                                                                  onRemoveCharacterFromPublicGroup?.(
-                                                                    group.id,
-                                                                    member.id ?? member.characterId,
-                                                                    contentName,
-                                                                  );
-                                                                }}
-                                                                className="text-[10px] px-1.5 py-0.5 text-red-600 dark:text-red-400 hover:underline"
-                                                              >
-                                                                제거
-                                                              </button>
-                                                              {(neopleCharacterId ??
-                                                                charFromList?.characterId) &&
-                                                                (member.server ??
-                                                                  charFromList?.server) && (
-                                                                  <a
-                                                                    href={`https://dundam.xyz/character?server=${toServerIdForUrl(
-                                                                      member.server ??
-                                                                        charFromList?.server ??
-                                                                        "",
-                                                                    )}&key=${
-                                                                      neopleCharacterId ??
-                                                                      charFromList?.characterId ??
-                                                                      ""
-                                                                    }`}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 whitespace-nowrap"
-                                                                  >
-                                                                    던담이동
-                                                                  </a>
+                                                          <div className="flex gap-4 flex-1 min-w-0 min-h-0">
+                                                            <div className="flex flex-col items-center flex-shrink-0">
+                                                              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 ring-2 ring-gray-100 dark:ring-gray-600">
+                                                                <span className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl font-bold text-gray-500 dark:text-gray-400">
+                                                                  {(member.nickname ?? "").charAt(
+                                                                    0,
+                                                                  ) || "?"}
+                                                                </span>
+                                                                {displayImage && (
+                                                                  <img
+                                                                    src={displayImage}
+                                                                    alt={member.nickname ?? ""}
+                                                                    className="relative w-full h-full object-cover object-[center_100%] scale-125"
+                                                                    onError={(e) => {
+                                                                      e.target.style.display =
+                                                                        "none";
+                                                                    }}
+                                                                  />
                                                                 )}
-                                                            </div>
-                                                          </div>
-                                                          <div className="flex-1 min-w-0">
-                                                            <div className="w-full text-center mb-2">
-                                                              {contentName &&
-                                                              ALLOWED_CLEAR_STATE_CONTENTS.includes(
-                                                                contentName,
-                                                              ) &&
-                                                              typeof onClearState === "function" &&
-                                                              isMyCharacter ? (
+                                                              </div>
+                                                              {(member.job ||
+                                                                charFromList?.job) && (
+                                                                <span className="text-xs font-bold text-gray-900 dark:text-white mt-2 text-center truncate max-w-[5rem] sm:max-w-[5.5rem]">
+                                                                  {member.job ?? charFromList?.job}
+                                                                </span>
+                                                              )}
+                                                              <div className="mt-2 flex items-center justify-center gap-1 flex-wrap">
                                                                 <button
                                                                   type="button"
                                                                   onClick={(e) => {
                                                                     e.stopPropagation();
-                                                                    if (isClear) return;
-                                                                    if (
-                                                                      clearingCharacterId !== null
-                                                                    )
-                                                                      return;
-                                                                    const characterId =
+                                                                    onRemoveCharacterFromPublicGroup?.(
+                                                                      group.id,
                                                                       member.id ??
-                                                                      member.characterId;
-                                                                    const contentLabel =
-                                                                      CONTENT_IDS[contentName] ??
-                                                                      contentName;
-                                                                    const confirmed =
-                                                                      window.confirm(
-                                                                        `"${
-                                                                          member.nickname ?? ""
-                                                                        }" 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`,
-                                                                      );
-                                                                    if (!confirmed) return;
-                                                                    setClearingCharacterId(
-                                                                      characterId,
-                                                                    );
-                                                                    onClearState([
-                                                                      characterId,
-                                                                    ]).finally(() =>
-                                                                      setClearingCharacterId(null),
+                                                                        member.characterId,
+                                                                      contentName,
                                                                     );
                                                                   }}
-                                                                  disabled={
-                                                                    clearingCharacterId ===
-                                                                    (member.id ??
-                                                                      member.characterId)
-                                                                  }
-                                                                  className={
-                                                                    isClear
-                                                                      ? "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-default"
-                                                                      : "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-pointer hover:underline focus:underline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                                                  }
-                                                                  title={
-                                                                    isClear
-                                                                      ? undefined
-                                                                      : "클릭 시 클리어 처리"
-                                                                  }
+                                                                  className="text-[10px] px-1.5 py-0.5 text-red-600 dark:text-red-400 hover:underline"
                                                                 >
-                                                                  {member.nickname ?? ""}
+                                                                  제거
                                                                 </button>
-                                                              ) : (
-                                                                <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
-                                                                  {member.nickname ?? ""}
-                                                                </span>
-                                                              )}
+                                                                {(neopleCharacterId ??
+                                                                  charFromList?.characterId) &&
+                                                                  (member.server ??
+                                                                    charFromList?.server) && (
+                                                                    <a
+                                                                      href={`https://dundam.xyz/character?server=${toServerIdForUrl(
+                                                                        member.server ??
+                                                                          charFromList?.server ??
+                                                                          "",
+                                                                      )}&key=${
+                                                                        neopleCharacterId ??
+                                                                        charFromList?.characterId ??
+                                                                        ""
+                                                                      }`}
+                                                                      target="_blank"
+                                                                      rel="noopener noreferrer"
+                                                                      className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 whitespace-nowrap"
+                                                                    >
+                                                                      던담이동
+                                                                    </a>
+                                                                  )}
+                                                              </div>
                                                             </div>
-                                                            {(member.adventureName ||
-                                                              member.server) && (
-                                                              <div className="text-xs text-center mb-2 flex flex-wrap justify-center items-center gap-x-1.5">
-                                                                {member.adventureName && (
-                                                                  <span className="text-purple-600 dark:text-purple-400">
-                                                                    ({member.adventureName})
-                                                                  </span>
-                                                                )}
-                                                                {member.server && (
-                                                                  <span className="text-gray-500 dark:text-gray-400">
-                                                                    [{member.server}]
+                                                            <div className="flex-1 min-w-0">
+                                                              <div className="w-full text-center mb-2">
+                                                                {contentName &&
+                                                                ALLOWED_CLEAR_STATE_CONTENTS.includes(
+                                                                  contentName,
+                                                                ) &&
+                                                                typeof onClearState ===
+                                                                  "function" &&
+                                                                isMyCharacter ? (
+                                                                  <button
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                      e.stopPropagation();
+                                                                      if (isClear) return;
+                                                                      if (
+                                                                        clearingCharacterId !== null
+                                                                      )
+                                                                        return;
+                                                                      const characterId =
+                                                                        member.id ??
+                                                                        member.characterId;
+                                                                      const contentLabel =
+                                                                        CONTENT_IDS[contentName] ??
+                                                                        contentName;
+                                                                      const confirmed =
+                                                                        window.confirm(
+                                                                          `"${
+                                                                            member.nickname ?? ""
+                                                                          }" 캐릭터를 ${contentLabel} 클리어 처리하시겠습니까?`,
+                                                                        );
+                                                                      if (!confirmed) return;
+                                                                      setClearingCharacterId(
+                                                                        characterId,
+                                                                      );
+                                                                      onClearState([
+                                                                        characterId,
+                                                                      ]).finally(() =>
+                                                                        setClearingCharacterId(
+                                                                          null,
+                                                                        ),
+                                                                      );
+                                                                    }}
+                                                                    disabled={
+                                                                      clearingCharacterId ===
+                                                                      (member.id ??
+                                                                        member.characterId)
+                                                                    }
+                                                                    className={
+                                                                      isClear
+                                                                        ? "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-default"
+                                                                        : "text-lg font-semibold text-gray-900 dark:text-white block truncate w-full mx-auto bg-transparent border-0 cursor-pointer hover:underline focus:underline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                    }
+                                                                    title={
+                                                                      isClear
+                                                                        ? undefined
+                                                                        : "클릭 시 클리어 처리"
+                                                                    }
+                                                                  >
+                                                                    {member.nickname ?? ""}
+                                                                  </button>
+                                                                ) : (
+                                                                  <span className="text-lg font-semibold text-gray-900 dark:text-white block truncate">
+                                                                    {member.nickname ?? ""}
                                                                   </span>
                                                                 )}
                                                               </div>
-                                                            )}
-                                                            <div className="flex flex-wrap items-center justify-center gap-1.5 mb-2">
-                                                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                                                명성 {displayValue}
-                                                              </span>
-                                                            </div>
-                                                            <div className="text-center">
-                                                              <EditableMemo
-                                                                characterId={
-                                                                  member.id ?? member.characterId
-                                                                }
-                                                                memo={displayMemo}
-                                                                onSave={onMemoUpdate}
-                                                                disabled={
-                                                                  !canEditMemo || !isMyCharacter
-                                                                }
-                                                                className="block truncate"
-                                                              />
+                                                              {(member.adventureName ||
+                                                                member.server) && (
+                                                                <div className="text-xs text-center mb-2 flex flex-wrap justify-center items-center gap-x-1.5">
+                                                                  {member.adventureName && (
+                                                                    <span className="text-purple-600 dark:text-purple-400">
+                                                                      ({member.adventureName})
+                                                                    </span>
+                                                                  )}
+                                                                  {member.server && (
+                                                                    <span className="text-gray-500 dark:text-gray-400">
+                                                                      [{member.server}]
+                                                                    </span>
+                                                                  )}
+                                                                </div>
+                                                              )}
+                                                              <div className="flex flex-wrap items-center justify-center gap-1.5 mb-2">
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                                  명성 {displayValue}
+                                                                </span>
+                                                              </div>
+                                                              <div className="text-center">
+                                                                <EditableMemo
+                                                                  characterId={
+                                                                    member.id ?? member.characterId
+                                                                  }
+                                                                  memo={displayMemo}
+                                                                  onSave={onMemoUpdate}
+                                                                  disabled={
+                                                                    !canEditMemo || !isMyCharacter
+                                                                  }
+                                                                  className="block truncate"
+                                                                />
+                                                              </div>
                                                             </div>
                                                           </div>
+                                                          <CharacterSetEquipOathRows
+                                                            setEquip={displaySetEquip}
+                                                            setOath={displaySetOath}
+                                                            clearState={isClear}
+                                                          />
                                                         </div>
                                                       );
                                                     })}

@@ -315,8 +315,15 @@ function InfoUpdateContent() {
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-900"
             />
             <span className="text-sm leading-snug text-gray-700 dark:text-gray-200">
-              캐릭터 한번 씩 들어가서 갱신 순회 같이하기, 키면 1~2분 걸림
+              캐릭터 한번 씩 들어가서 갱신 순회 같이하기, 키면 1~2분 더 걸림
             </span>
+            {isMemoUpdating ? (
+              <span className="text-sm leading-snug text-gray-700 dark:text-gray-200">
+                창을 꺼도 문제 없이 순회를 계속 진행합니다.
+              </span>
+            ) : (
+              ""
+            )}
           </label>
           <DialogFooter className="flex gap-2 justify-end sm:justify-end">
             <button
@@ -333,7 +340,7 @@ function InfoUpdateContent() {
               disabled={isMemoUpdating}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
             >
-              {isMemoUpdating ? "요청 중... (약 10초 소요)" : "실행"}
+              {isMemoUpdating ? "실행 중... (약 10초+ 소요)" : "실행"}
             </button>
           </DialogFooter>
         </DialogContent>

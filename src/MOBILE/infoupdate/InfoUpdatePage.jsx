@@ -22,7 +22,6 @@ function MobileInfoUpdatePage() {
           </button>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-gray-900 dark:text-white">실험실</p>
-            <p className="truncate text-xs text-gray-500 dark:text-gray-400">/infoupdate</p>
           </div>
         </div>
       </header>

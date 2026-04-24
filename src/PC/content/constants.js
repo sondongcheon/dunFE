@@ -7,6 +7,7 @@ import venus_goddess_of_beautyBg from "@/Assets/venus_goddess_of_beauty.jpg";
 import nabelBg from "@/Assets/nabel.jpg";
 import inaeBg from "@/Assets/inae.jpg";
 import diregieBg from "@/Assets/diregie.jpg";
+import apocalypseBg from "@/Assets/apocalypse.jpg";
 
 /**
  * content별 배경 이미지 (CONTENT_IDS key와 동일한 이름의 Assets 파일)
@@ -18,6 +19,7 @@ export const CONTENT_BG_IMAGES = {
     star_turtle_grand_library: star_turtle_grand_libraryBg,
     heretics_castle: heretics_castleBg,
     venus_goddess_of_beauty: venus_goddess_of_beautyBg,
+    apocalypse: apocalypseBg,
     nabel: nabelBg,
     inae: inaeBg,
     diregie: diregieBg,
@@ -35,6 +37,7 @@ export const CONTENT_IDS = {
     star_turtle_grand_library: "별거북 대서고",
     heretics_castle: "배교자의 성",
     venus_goddess_of_beauty: "미의 여신 베누스",
+    apocalypse: "아포칼립스",
     nabel: "만들어진 신, 나벨",
     inae: "이내 황혼전",
     diregie: "검은 역병의 디레지에",

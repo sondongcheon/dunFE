@@ -44,10 +44,10 @@ function TestPage() {
 
   // 메인 컨텐츠 바로가기 목록
   const mainContentKeys = [
-    "inae",
     "diregie",
     "star_turtle_grand_library",
     "heretics_castle",
+    "apocalypse",
   ];
   const contentList = mainContentKeys.map((key) => [key, CONTENT_IDS[key]]);
 

@@ -12,6 +12,7 @@ export const MY_INFO_CLEAR_FIELD_BY_CONTENT_ID = Object.freeze({
     star_turtle_grand_library: "starTurtleGrandLibrary",
     heretics_castle: "hereticsCastle",
     venus_goddess_of_beauty: "venusGoddessOfBeauty",
+    apocalypse: "apocalypse",
     nabel: "nabel",
     inae: "inae",
     diregie: "diregie",

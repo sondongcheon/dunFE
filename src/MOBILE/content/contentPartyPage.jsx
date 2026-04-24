@@ -8,13 +8,14 @@ const SLOTS_PER_TEAM = 4;
 
 const getTeamCountByContent = (contentName) => {
   const map = {
-    azure_main: 2,
-    goddess_of_death_temple: 3,
-    freed_nightmare: 3,
-    star_turtle_grand_library: 3,
-    heretics_castle: 3,
-    venus_goddess_of_beauty: 2,
-    nabel: 1,
+    azure_main: 1,
+    goddess_of_death_temple: 1,
+    freed_nightmare: 1,
+    star_turtle_grand_library: 1,
+    heretics_castle: 1,
+    venus_goddess_of_beauty: 1,
+    apocalypse: 1,
+    nabel: 3,
     inae: 2,
     diregie: 3,
   };
@@ -174,10 +175,7 @@ function MobileContentPartyPage() {
             keys.reduce((acc, k) => ({ ...acc, [k]: formationList[k].name ?? `${k + 1}공대` }), {}),
           );
           setRaidOrders(
-            keys.reduce(
-              (acc, k) => ({ ...acc, [k]: Number(formationList[k].order) || k + 1 }),
-              {},
-            ),
+            keys.reduce((acc, k) => ({ ...acc, [k]: Number(formationList[k].order) || k + 1 }), {}),
           );
           setSlotsByRaid(
             keys.reduce(

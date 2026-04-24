@@ -12,6 +12,7 @@ const getTeamCountByContent = (contentName) => {
     star_turtle_grand_library: 3,
     heretics_castle: 3,
     venus_goddess_of_beauty: 2,
+    apocalypse: 2,
     nabel: 1,
     inae: 2,
     diregie: 3,
